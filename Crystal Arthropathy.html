@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه جامع و تعاملی مدیریت بالینی نقرس و اختلالات اسید اوریک</title>
+  
+  <!-- فونت وزیرمتن -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            vazir: ['Vazirmatn', 'sans-serif'],
+          },
+          colors: {
+            medical: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              500: '#0284c7',
+              600: '#0265a0',
+              700: '#034e82',
+              800: '#07396b',
+              900: '#0c274c',
+              950: '#061733'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      direction: rtl;
+      text-align: right;
+      overflow-x: hidden;
+    }
+
+    /* Flip Card 3D Animation */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .flip-card-inner {
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* Glassmorphism & Custom Scrollbar */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0284c7;
+      border-radius: 4px;
+    }
+
+    /* Nav Tab Active Effect */
+    .page-tab-btn.active {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased">
+
+  <!-- ================= HEADER & NAVIGATION ================= -->
+  <header class="bg-medical-950 text-white sticky top-0 z-50 border-b border-medical-800/60 shadow-lg backdrop-blur-lg bg-opacity-95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-medical-500 to-sky-300 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+          </div>
+          <div>
+            <span class="text-xs text-sky-400 font-bold tracking-wider block">سامانه تخصصی روماتولوژی</span>
+            <h1 class="text-lg sm:text-xl font-black text-white">پورتال جامع نقرس و اسید اوریک</h1>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-1.5 bg-medical-900/80 p-1.5 rounded-2xl border border-medical-800">
+          <button onclick="navigateTo('home')" id="nav-home" class="page-tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200">
+            صفحه اصلی & داشبورد
+          </button>
+          <button onclick="navigateTo('lessons')" id="nav-lessons" class="page-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all duration-200">
+            درس‌نامه جامع
+          </button>
+          <button onclick="navigateTo('calculator')" id="nav-calculator" class="page-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all duration-200">
+            ماشین‌حساب تشخیصی
+          </button>
+          <button onclick="navigateTo('protocols')" id="nav-protocols" class="page-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all duration-200">
+            پروتکل‌های درمانی
+          </button>
+          <button onclick="navigateTo('interactive')" id="nav-interactive" class="page-tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white transition-all duration-200">
+            یادگیری تعاملی & آزمون
+          </button>
+        </nav>
+
+        <!-- Action Badge -->
+        <div class="hidden lg:flex items-center gap-2 bg-sky-500/10 border border-sky-400/20 px-3.5 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-bold text-sky-200">گایدلاین‌های UpToDate</span>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-medical-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-medical-900 border-b border-medical-800 px-4 py-3 space-y-2 text-xs font-bold">
+      <button onclick="navigateTo('home'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 text-white bg-medical-800 rounded-lg">صفحه اصلی & داشبورد</button>
+      <button onclick="navigateTo('lessons'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 text-slate-300 hover:text-white">درس‌نامه جامع</button>
+      <button onclick="navigateTo('calculator'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 text-slate-300 hover:text-white">ماشین‌حساب تشخیصی</button>
+      <button onclick="navigateTo('protocols'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 text-slate-300 hover:text-white">پروتکل‌های درمانی</button>
+      <button onclick="navigateTo('interactive'); toggleMobileMenu();" class="block w-full text-right px-3 py-2 text-slate-300 hover:text-white">یادگیری تعاملی & آزمون</button>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <div class="bg-gradient-to-b from-medical-950 via-medical-900 to-slate-900 text-white py-12 px-4 sm:px-8 border-b border-slate-800 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <div class="lg:col-span-7 space-y-5 text-center lg:text-right">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-bold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          پلتفرم مرجع آموزش و تصمیم‌گیری بالینی
+        </span>
+        <h2 class="text-2xl sm:text-4xl lg:text-5xl font-black leading-tight tracking-tight">
+          مدیریت هوشمند و شواهد-محور <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">بیماری نقرس</span>
+        </h2>
+        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto lg:mx-0">
+          دسترسی یکپارچه به مفاهیم پاتوفیزیولوژی، معیار تشخیصی هلندی (Clinical Diagnostic Rule)، محاسبه دوزینگ در بیماران CKD و پیوند کلیه، فلش‌کارت‌های سه‌بعدی و الگوریتم‌های درمانی بر اساس آخرین مقالات UpToDate.
+        </p>
+
+        <div class="flex flex-wrap gap-3 justify-center lg:justify-start pt-2">
+          <button onclick="navigateTo('calculator')" class="px-6 py-3 rounded-2xl bg-medical-500 hover:bg-medical-600 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            محاسبه امتیاز تشخیصی نقرس
+          </button>
+          <button onclick="navigateTo('protocols')" class="px-6 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-sky-200 border border-slate-700 font-bold text-xs sm:text-sm transition-all flex items-center gap-2">
+            مشاهده الگوریتم‌های درمانی
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="lg:col-span-5 grid grid-cols-2 gap-3">
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl backdrop-blur-md">
+          <span class="text-3xl font-black text-sky-400 block mb-1">6.8 <span class="text-xs text-slate-400">mg/dL</span></span>
+          <span class="text-xs font-bold text-slate-200 block">حد حلالیت پلاسما</span>
+          <p class="text-[11px] text-slate-400 mt-1">نقطه فوق‌اشباع اورات در دمای ۳۷ درجه سانتی‌گراد</p>
+        </div>
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl backdrop-blur-md">
+          <span class="text-3xl font-black text-emerald-400 block mb-1">&lt; 6.0 <span class="text-xs text-slate-400">mg/dL</span></span>
+          <span class="text-xs font-bold text-slate-200 block">هدف درمانی ULT</span>
+          <p class="text-[11px] text-slate-400 mt-1">هدف جهانی درمان کاهش‌دهنده اسید اوریک</p>
+        </div>
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl backdrop-blur-md">
+          <span class="text-3xl font-black text-amber-400 block mb-1">80%</span>
+          <span class="text-xs font-bold text-slate-200 block">درگیری اولیه 1st MTP</span>
+          <p class="text-[11px] text-slate-400 mt-1">شیوع درگیری شست پا (پوداگرا) در حملات حاد</p>
+        </div>
+        <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-2xl backdrop-blur-md">
+          <span class="text-3xl font-black text-purple-400 block mb-1">100%</span>
+          <span class="text-xs font-bold text-slate-200 block">اختصاصیت آرتوسنتز</span>
+          <p class="text-[11px] text-slate-400 mt-1">مشاهده کریستال MSU با میکروسکوپ پلاریزه</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MAIN CONTENT VIEWS ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+    <!-- VIEW 1: HOME & DASHBOARD -->
+    <div id="view-home" class="page-view space-y-8">
+      
+      <!-- Quick Dashboard Modules -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1 -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-2xl bg-sky-100 text-medical-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="font-black text-slate-900 text-base mb-2">مدیریت حملات حاد (Acute Flares)</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            شروع درمان در ۱۲ ساعت اول با کلشیسین دوز پایین، NSAIDها یا استروئیدهای خوراکی و تزریقی مفصلی.
+          </p>
+          <button onclick="navigateTo('protocols')" class="text-xs font-bold text-medical-600 hover:text-medical-800 flex items-center gap-1">
+            بررسی پروتکل دارویی ➔
+          </button>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="font-black text-slate-900 text-base mb-2">درمان کاهش‌دهنده اسید اوریک (ULT)</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            تنظیم دوز آلوپورینول و فبوکسوستات با الگوریتم Treat-to-Target به همراه ۶ ماه پروفلاکسی اولیه.
+          </p>
+          <button onclick="navigateTo('lessons')" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1">
+            مطالعه راهنمای ULT ➔
+          </button>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-md transition">
+          <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold mb-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          </div>
+          <h3 class="font-black text-slate-900 text-base mb-2">شرایط خاص (CKD و پیوند)</h3>
+          <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            هشدار تداخلات مرگبار (مانند آلوپورینول با آزاتیوپرین) و تنظیم دوزینگ دقیق در نارسایی کلیه.
+          </p>
+          <button onclick="navigateTo('protocols')" class="text-xs font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
+            جدول تداخلات دارویی ➔
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Overview Diagram Section -->
+      <div class="bg-gradient-to-r from-medical-900 to-medical-800 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="max-w-3xl space-y-4">
+          <span class="bg-sky-400/20 text-sky-200 text-xs font-bold px-3 py-1 rounded-full border border-sky-400/30 inline-block">
+            فرآیند آسیب‌شناسی بیماری
+          </span>
+          <h3 class="text-xl sm:text-2xl font-black">سیر پاتوفیزیولوژیک از هیپراوریسمی تا آرتریت تخریبی</h3>
+          <p class="text-xs sm:text-sm text-sky-100 leading-relaxed">
+            هیپراوریسمی مزمن (سطح اورات بالای 6.8 mg/dL) ➔ تشکیل کریستال‌های مونوسدیم اورات (MSU) ➔ بلع کریستال توسط ماکروفاژها ➔ فعال‌سازی کمپلکس NLRP3 Inflammasome ➔ آزادسازی اینترلوکین 1 بتا (IL-1β) ➔ فراخوانی نوتروفیل‌ها و ایجاد آرتریت حاد فوق‌التهابی.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: LESSONS / MEDICAL TEXT -->
+    <div id="view-lessons" class="page-view hidden space-y-8">
+      
+      <!-- Section Header -->
+      <div class="border-r-4 border-medical-500 pr-4">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900">درس‌نامه جامع و مرجع پزشکی نقرس</h2>
+        <p class="text-xs text-slate-500">منطابق با سرفصل‌های رسمی UpToDate (Rheumatology & Crystal Diseases)</p>
+      </div>
+
+      <!-- Module 1: Pathophysiology -->
+      <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <span class="w-10 h-10 rounded-2xl bg-medical-500 text-white flex items-center justify-center font-bold text-sm">۱</span>
+          <div>
+            <h3 class="font-black text-slate-900 text-lg">پاتوفیزیولوژی و سیر طبیعی نقرس</h3>
+            <span class="text-xs text-slate-400">Pathophysiology and Natural History of Gout</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs text-slate-700 leading-relaxed">
+          <div class="space-y-4">
+            <div class="bg-sky-50/70 p-4 rounded-2xl border border-sky-100 space-y-2">
+              <h4 class="font-bold text-medical-900 text-sm">تعریف فیزیکوشیمیایی هیپراوریسمی:</h4>
+              <p>
+                اسید اوریک محصول نهایی متابولیسم پورین‌ها در انسان است. حد حلالیت فیزیکوشیمیایی اورات در پلاسما در دمای ۳۷ درجه سانتی‌گراد حدود <strong>6.8 mg/dL</strong> است. مقادیر بالاتر از این سطح نشان‌دهنده حالت فوق‌اشباع (Supersaturation) پلاسما می‌باشد.
+              </p>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2">
+              <h4 class="font-bold text-slate-900 text-sm">مراحل سه‌گانه سیر بیماری:</h4>
+              <ol class="list-decimal list-inside space-y-1.5 text-slate-700">
+                <li><strong>آرتریت حاد نقرسی (Gout Flare):</strong> حمله حاد شدیداً دردناک که معمولاً تک‌مفصلی است.</li>
+                <li><strong>نقرس بین‌حمله‌ای (Intercritical Gout):</strong> دوره کاملاً بدون علامت بین حملات.</li>
+                <li><strong>نقرس مزمن توفوسی (Chronic Tophaceous Gout):</strong> رسوب توده‌های سخت کریستالی همراه با اروزیون و تخریب استخوانی.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200/80 space-y-2 text-amber-950">
+              <h4 class="font-bold text-amber-900 text-sm">عوامل زمینه‌ساز و تحریک‌کننده حملات (Triggers):</h4>
+              <ul class="list-disc list-inside space-y-1 text-[11px]">
+                <li>تغییرات سریع در سطح اورات پلاسما (شروع یا تغییر دوز داروهای ULT، روزه‌داری، دهیدراتاسیون)</li>
+                <li>مصرف مشروبات الکلی (به‌ویژه آبجو به دلیل داشتن پورین بالا)</li>
+                <li>تروماهای خفیف مفصلی، جراحی‌های سنگین</li>
+                <li>رژیم غذایی غنی از گوشت قرمز، صدف دریایی و شربت ذرت با فروکتوز بالا (HFCS)</li>
+                <li>داروهای دیورتیک تیازیوی/لوپ و آسپیرین دوز پایین</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module 2: Diagnosis -->
+      <div class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <span class="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-bold text-sm">۲</span>
+          <div>
+            <h3 class="font-black text-slate-900 text-lg">تشخیص بالینی و آزمایشگاهی</h3>
+            <span class="text-xs text-slate-400">Diagnosis and Synovial Fluid Analysis</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-2">
+            <strong class="font-bold text-emerald-950 block text-sm">آنالیز مایع مفصلی (Arthrocentesis):</strong>
+            <p class="text-slate-700 leading-relaxed">
+              استاندارد طلایی قطعی: مشاهده کریستال‌های سوزنی‌شکل MSU با **بای‌رفرنجنس منفی پرقدرت** در میکروسکوپ پلاریزه. شمارش WBC مایع مفصلی معمولاً ۱۰,۰۰۰ تا ۱۰۰,۰۰۰ با غلبه نوتروفیلی است.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-2">
+            <strong class="font-bold text-sky-950 block text-sm">تصویربرداری (Ultrasound & DECT):</strong>
+            <p class="text-slate-700 leading-relaxed">
+              علامت خط دوتایی (Double Contour Sign) در سونوگرافی ناشی از رسوب خطی اورات روی غضروف مفصلی اختصاصیت بالایی دارد. سی‌تی دوانرژی (DECT) قادر به جداسازی کریستال‌های اورات از رسوبات کلسیمی است.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-2">
+            <strong class="font-bold text-purple-950 block text-sm">تفسیر سطح اسید اوریک سرم:</strong>
+            <p class="text-slate-700 leading-relaxed">
+              در ۱۲٪ تا ۴۳٪ موارد، سطح اسید اوریک سرم در طی حمله حاد **نرمال یا پایین** است! دقیق‌ترین زمان سنجش سطح پایه، حداقل ۲ هفته پس از رفع کامل علائم حاد است.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 3: DIAGNOSTIC CALCULATOR -->
+    <div id="view-calculator" class="page-view hidden space-y-8">
+      
+      <!-- Section Header -->
+      <div class="border-r-4 border-medical-500 pr-4">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900">ماشین‌حساب تشخیصی هلندی (Dutch Clinical Diagnostic Rule)</h2>
+        <p class="text-xs text-slate-500">محاسبه احتمال بالینی نقرس در آرتریت تک‌مفصلی حاد (بدون نیاز به آرتوسنتز فوری)</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Checklist Form -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-3 text-xs">
+          <h3 class="font-bold text-slate-900 text-sm border-b pb-3 mb-4">معیارهای بالینی و آزمایشگاهی را علامت بزنید:</h3>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۱. جنسیت مذکر (Male sex)</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۲</span>
+              <input type="checkbox" id="calc-sex" value="2" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۲. سابقه قبلی حمله آرتریت گزارش‌شده توسط بیمار</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۲</span>
+              <input type="checkbox" id="calc-flare" value="2" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۳. شروع سریع علائم (رسیدن به حداکثر شدت طی ۲۴ ساعت)</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۰.۵</span>
+              <input type="checkbox" id="calc-onset" value="0.5" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۴. قرمزی مفصل (Joint redness)</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۱</span>
+              <input type="checkbox" id="calc-redness" value="1" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۵. درگیری مفصل اول متاتارسوفالانژال (پوداگرا - 1st MTP)</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۲.۵</span>
+              <input type="checkbox" id="calc-mtp" value="2.5" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۶. فشارخون بالا یا حداقل یک بیماری قلبی-عروقی</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۱.۵</span>
+              <input type="checkbox" id="calc-htn" value="1.5" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+
+          <label class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 hover:bg-slate-100/80 cursor-pointer transition">
+            <span class="font-bold text-slate-800">۷. سطح اسید اوریک سرم بالاتر از 5.88 mg/dL (350 µmol/L)</span>
+            <span class="flex items-center gap-2">
+              <span class="bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg font-mono font-bold text-[11px]">+۳.۵</span>
+              <input type="checkbox" id="calc-urate" value="3.5" class="w-4 h-4 text-medical-600 rounded" onchange="calculateGoutScore()">
+            </span>
+          </label>
+        </div>
+
+        <!-- Dynamic Output -->
+        <div class="lg:col-span-5 bg-slate-950 text-white p-8 rounded-3xl flex flex-col justify-between shadow-2xl border border-slate-800">
+          <div class="space-y-4">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">ارزیابی بالینی خودکار</span>
+            
+            <div class="flex items-baseline gap-2">
+              <span id="score-value" class="text-6xl font-black text-sky-400">0</span>
+              <span class="text-slate-400 text-xs">از ۱۳ امتیاز کل</span>
+            </div>
+
+            <!-- Score Bar Progress -->
+            <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden p-0.5 border border-slate-700">
+              <div id="score-bar" class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+            </div>
+
+            <div id="risk-badge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+              احتمال پایین (Low Probability)
+            </div>
+
+            <p id="score-interpretation" class="text-xs text-slate-300 leading-relaxed">
+              امتیاز کمتر یا مساوی ۴ نشان‌دهنده احتمال بسیار پایین نقرس است (حدود ۲.۲٪). احتمال نقرس بسیار پایین بوده و باید تشخیص‌های جایگزین مانند آرتریت سپتیک رد شوند.
+            </p>
+          </div>
+
+          <div class="mt-6 bg-slate-900 p-4 rounded-2xl border border-slate-800 text-xs space-y-1">
+            <strong class="text-sky-300 block">توصیه اقدام بالینی:</strong>
+            <span id="action-recommendation" class="text-slate-300 block leading-relaxed">نیازی به درمان آنتی‌هیپراوریسمی نیست؛ آرتوسنتز مفصل در صورت شک به آرتریت عفونی الزامی است.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 4: TREATMENT PROTOCOLS -->
+    <div id="view-protocols" class="page-view hidden space-y-8">
+      
+      <!-- Section Header -->
+      <div class="border-r-4 border-amber-500 pr-4">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900">پروتکل‌های درمانی و جدول تداخلات دارویی</h2>
+        <p class="text-xs text-slate-500">راهنمای درمان حمله حاد، الگوریتم ULT و دوزینگ در نارسایی کلیوی/پیوند</p>
+      </div>
+
+      <!-- Acute vs ULT Flowcharts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+        
+        <!-- Acute Flare Protocol -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-black text-rose-700 text-sm">۱. درمان حمله حاد (Acute Gout Flare)</h3>
+            <span class="bg-rose-100 text-rose-800 px-3 py-1 rounded-full text-[10px] font-bold">شروع سریع زیر ۱۲ ساعت</span>
+          </div>
+
+          <ul class="space-y-3 text-slate-700">
+            <li class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+              <strong class="text-slate-900 block mb-1">کلشیسین دوز پایین (Low-dose Colchicine):</strong>
+              ۱.۲ میلی‌گرم در ابتدا ➔ ۰.۶ میلی‌گرم ۱ ساعت بعد (جمعاً ۱.۸ mg در روز اول). روزهای بعدی ۰.۶ mg ۱ تا ۲ بار در روز.
+            </li>
+            <li class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+              <strong class="text-slate-900 block mb-1">NSAIDs (با دوز کامل):</strong>
+              ناپروکسن (500mg BID) یا ایندومتاسین (50mg TID) یا سلکوکسیب دوز بالا. ترجیحاً در سن زیر ۶۰ سال بدون بیماری کلیوی/قلبی.
+            </li>
+            <li class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
+              <strong class="text-slate-900 block mb-1">کورتیکواستروئیدها (Oral or Intra-articular):</strong>
+              پرادنیزولون خوراکی 30-40 mg روزانه با تیپر طی ۷ تا ۱۴ روز. یا تزریق داخل مفصلی تریامسینولون در درگیری ۱ یا ۲ مفصل.
+            </li>
+          </ul>
+        </div>
+
+        <!-- ULT Protocol -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-black text-medical-800 text-sm">۲. درمان کاهش‌دهنده اسید اوریک (ULT)</h3>
+            <span class="bg-sky-100 text-medical-800 px-3 py-1 rounded-full text-[10px] font-bold">استراتژی Treat-to-Target</span>
+          </div>
+
+          <div class="space-y-3 text-slate-700">
+            <div class="bg-sky-50/80 p-3.5 rounded-2xl border border-sky-200/80">
+              <strong class="text-medical-950 block mb-1">اهداف اسید اوریک سرم:</strong>
+              <ul class="list-disc list-inside space-y-1">
+                <li>هدف عمومی: زیر <strong>6.0 mg/dL</strong> (357 µmol/L)</li>
+                <li>در نقرس توفوسی: زیر <strong>5.0 mg/dL</strong> (جهت تسریع حلالیت توفوس)</li>
+              </ul>
+            </div>
+
+            <ul class="space-y-2">
+              <li><strong>آلوپورینول:</strong> خط اول. شروع با 100 mg/day (در CKD دوز کمتر) و افزایش ۵۰ تا ۱۰۰ میلی‌گرم هر ۲-۴ هفته تا رسیدن به هدف.</li>
+              <li><strong>فبوکسوستات:</strong> مهارکننده غیرپورینی XO. دوز شروع 40 mg روزانه. در بیماران با ریسک بالای قلبی عروقی با احتیاط مصرف شود.</li>
+              <li><strong>پروفلاکسی обязаتی:</strong> همزمان با شروع ULT، تجویز کلشیسین دوز پایین (0.6 mg daily) به مدت ۳ تا ۶ ماه جهت جلوگیری از Flaring ضروری است.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Matrix Table: Special Populations & Interactions -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-sm space-y-4">
+        <h3 class="font-black text-slate-900 text-sm border-b pb-3">جدول تداخلات دارویی و ملاحظات پیوند / نارسایی کلیه (CKD)</h3>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                <th class="p-3">دارو / وضع بالینی</th>
+                <th class="p-3">تداخل / خطرات بالینی</th>
+                <th class="p-3">دستورالعمل و جایگزین پیشنهادی</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="p-3 font-bold text-red-700">آلوپورینول + آزاتیوپرین (Aza)</td>
+                <td class="p-3">مهار ميزان متابولیسم 6-MP و سرکوب شدید و مرگبار مغز استخوان</td>
+                <td class="p-3">اجتناب مطلق. یا کاهش ۷۵٪ دوز Aza یا جایگزینی Aza با مایکوفتولات (MMF).</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-amber-700">کلشیسین + سیکلوسپورین</td>
+                <td class="p-3">افزایش شدید سطح کلشیسین و خطر بروز میونوروپاتی شدید</td>
+                <td class="p-3">محدود کردن کلشیسین به یک دوز 0.6mg در حمله حاد و عدم تکرار تا ۳ روز.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-medical-800">آلوپورینول در CKD (مرحله ۳ به بالا)</td>
+                <td class="p-3">خطر بروز واکنش شدید پوستی (AHS / Stevens-Johnson)</td>
+                <td class="p-3">دوز شروع نباید از 1.5mg به ازای هر واحد eGFR تجاوز کند (مثلاً eGFR=50 ➔ max 75mg/day).</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-emerald-800">سنگ اسید اوریکی (Nephrolithiasis)</td>
+                <td class="p-3">رسوب سنگ در pH اسیدی ادرار (کمتر از ۵.۵)</td>
+                <td class="p-3">قلیایی‌سازی ادرار با پتاسیم سیترات (هدف pH بین ۶.۵ تا ۷) + مصرف مایعات بالای ۲ لیتر.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 5: INTERACTIVE LEARNING & QUIZ -->
+    <div id="view-interactive" class="page-view hidden space-y-8">
+      
+      <!-- Section Header -->
+      <div class="border-r-4 border-purple-500 pr-4">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900">یادگیری تعاملی: فلش‌کارت‌های سه‌بعدی و آزمون خودارزیابی</h2>
+        <p class="text-xs text-slate-500">مرور نکات کلیدی بالینی و ارزشیابی دانش تشخیصی-درمانی</p>
+      </div>
+
+      <!-- 3D Flashcards Section -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
+          <div>
+            <h3 class="font-black text-slate-900 text-base">فلش‌کارت‌های مرجع سریع</h3>
+            <p class="text-xs text-slate-500">روی کارت کلیک کنید تا پاسخ علمی آن چرخش یابد.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="prevCard()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">قبلی</button>
+            <span id="card-counter" class="text-xs font-black text-medical-600 px-3">1 از 6</span>
+            <button onclick="nextCard()" class="px-4 py-2 bg-medical-600 hover:bg-medical-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-sky-500/20">بعدی</button>
+          </div>
+        </div>
+
+        <!-- Flip Card Component -->
+        <div class="max-w-xl mx-auto perspective-1000 my-6">
+          <div id="flashcard" onclick="flipCard()" class="flip-card w-full h-72 cursor-pointer relative">
+            <div class="flip-card-inner w-full h-full duration-500 transform-style-3d relative">
+              
+              <!-- Front Side -->
+              <div class="backface-hidden absolute inset-0 w-full h-full bg-gradient-to-br from-white to-sky-50 border-2 border-sky-200 rounded-3xl p-6 flex flex-col justify-between shadow-lg">
+                <div class="flex justify-between items-center">
+                  <span id="card-category" class="bg-sky-100 text-sky-800 text-[10px] font-bold px-3 py-1 rounded-full">تشخیص</span>
+                  <span class="text-slate-400 text-xs font-mono font-bold">پرسش بالینی</span>
+                </div>
+                <p id="card-question" class="text-base font-bold text-slate-800 text-center my-auto leading-relaxed px-2">
+                  نمای تشخیصی اختصاصی نقرس در سونوگرافی مفصل چیست؟
+                </p>
+                <span class="text-center text-xs text-medical-600 font-bold bg-white/80 py-2 rounded-xl border border-sky-200 shadow-sm">🔄 کلیک کنید تا پاسخ نمایان شود</span>
+              </div>
+
+              <!-- Back Side -->
+              <div class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full bg-gradient-to-br from-medical-900 to-medical-800 text-white rounded-3xl p-6 flex flex-col justify-between shadow-lg">
+                <div class="flex justify-between items-center">
+                  <span class="bg-medical-700 text-sky-200 text-[10px] font-bold px-3 py-1 rounded-full">پاسخ علمی</span>
+                  <span class="text-sky-300 text-xs font-mono font-bold">UpToDate</span>
+                </div>
+                <p id="card-answer" class="text-sm font-medium text-sky-100 text-center my-auto leading-relaxed px-2">
+                  علامت خط دوتایی (Double Contour Sign - DCS) که ناشی از رسوب خطی هیپراکوی کریستال‌های اورات روی غضروف مفصلی است.
+                </p>
+                <span class="text-center text-xs text-sky-300 opacity-80">کلیک جهت چرخش مجدد</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical Quiz Section -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+        <div class="flex justify-between items-center border-b pb-4">
+          <div>
+            <h3 class="font-black text-slate-900 text-base">آزمون سناریومحور بالینی</h3>
+            <p class="text-xs text-slate-500">بر براساس کیس‌های واقعی و سوالات امتحانی</p>
+          </div>
+          <div class="bg-slate-100 px-4 py-2 rounded-2xl text-center">
+            <span class="text-[10px] text-slate-400 block font-bold">امتیاز شما</span>
+            <span id="quiz-score" class="text-base font-black text-medical-600">0 / 0</span>
+          </div>
+        </div>
+
+        <div id="quiz-box" class="space-y-4">
+          <div class="flex justify-between items-center text-xs text-slate-400 border-b pb-2">
+            <span id="quiz-progress-text" class="font-bold text-slate-600">سوال ۱ از ۴</span>
+            <span id="quiz-topic" class="font-bold text-medical-700 bg-sky-50 px-2.5 py-1 rounded-lg">درمان دارویی</span>
+          </div>
+
+          <h4 id="quiz-question" class="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+            مرد ۵۵ ساله‌ای با سابقه پیوند کلیه (در حال مصرف سیکلوسپورین) با آرتریت حاد و شدید مفصل MTP اول مراجعه کرده است. کدام گزینه برای درمان حمله حاد ترجیح داده می‌شود؟
+          </h4>
+
+          <div id="quiz-options" class="space-y-2.5 pt-2">
+            <!-- Options dynamically generated -->
+          </div>
+
+          <div id="quiz-explanation" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs leading-relaxed mt-4 text-slate-700">
+            <!-- Explanation dynamically generated -->
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button id="next-quiz-btn" onclick="nextQuestion()" class="hidden px-5 py-2.5 bg-medical-600 text-white rounded-xl text-xs font-bold hover:bg-medical-700 transition shadow-md">
+              سوال بعدی ➔
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-medical-950 text-slate-400 text-xs border-t border-slate-800 py-10 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-right border-b border-slate-800 pb-6">
+        <div>
+          <h4 class="text-white font-black text-sm mb-1">سامانه مرجع تخصصی نقرس و اسید اوریک</h4>
+          <p class="text-slate-400 text-[11px]">طراحی‌شده بر اساس آخرین شواهد و گایدلاین‌های رسمی UpToDate 2024</p>
+        </div>
+        <div class="flex gap-4 font-bold text-slate-300">
+          <button onclick="navigateTo('home')" class="hover:text-white">صفحه اصلی</button>
+          <button onclick="navigateTo('lessons')" class="hover:text-white">درس‌نامه</button>
+          <button onclick="navigateTo('calculator')" class="hover:text-white">ماشین‌حساب</button>
+          <button onclick="navigateTo('protocols')" class="hover:text-white">پروتکل‌ها</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-2 text-[11px] text-slate-500">
+        <p>استفاده از این سامانه جهت ارتقای دانش بالینی همکاران گرامی است. تصمیم‌گیری نهایی درمانی بر عهده پزشک معالج می‌باشد.</p>
+        <p>© تمام حقوق محفوظ است.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT APP ENGINE ================= -->
+  <script>
+    // SPA NAVIGATION SYSTEM
+    function navigateTo(viewId) {
+      document.querySelectorAll('.page-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.page-tab-btn').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('text-slate-300');
+      });
+
+      const targetView = document.getElementById('view-' + viewId);
+      const targetNav = document.getElementById('nav-' + viewId);
+
+      if (targetView) targetView.classList.remove('hidden');
+      if (targetNav) {
+        targetNav.classList.add('active');
+        targetNav.classList.remove('text-slate-300');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // CALCULATOR LOGIC
+    function calculateGoutScore() {
+      let score = 0;
+      const inputs = ['calc-sex', 'calc-flare', 'calc-onset', 'calc-redness', 'calc-mtp', 'calc-htn', 'calc-urate'];
+
+      inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.checked) {
+          score += parseFloat(el.value);
+        }
+      });
+
+      const scoreValueEl = document.getElementById('score-value');
+      const scoreBarEl = document.getElementById('score-bar');
+      const badgeEl = document.getElementById('risk-badge');
+      const interpEl = document.getElementById('score-interpretation');
+      const actionEl = document.getElementById('action-recommendation');
+
+      scoreValueEl.innerText = score;
+      const percentage = Math.min((score / 13) * 100, 100);
+      scoreBarEl.style.width = percentage + '%';
+
+      if (score <= 4) {
+        badgeEl.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700";
+        badgeEl.innerText = "احتمال پایین (Low Probability ≤ 4)";
+        interpEl.innerText = "شیوع نقرس در این گروه حدود ۲.۲٪ است. احتمال نقرس بسیار پایین بوده و باید تشخیص‌های جایگزین مانند آرتریت سپتیک رد شوند.";
+        actionEl.innerText = "نیازی به درمان آنتی‌هیپراوریسمی نیست؛ آرتوسنتز مفصل در صورت شک به آرتریت عفونی الزامی است.";
+        scoreBarEl.className = "bg-sky-400 h-full rounded-full transition-all duration-300";
+      } else if (score > 4 && score < 8) {
+        badgeEl.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-amber-500 text-slate-950 border border-amber-400";
+        badgeEl.innerText = "احتمال متوسط (Intermediate Probability >4 & <8)";
+        interpEl.innerText = "شیوع نقرس حدود ۳۱٪ است. بیمار در محدوده خاکستری قرار دارد و نمی‌توان نقرس را صرفاً بر اساس بالین رد یا تایید کرد.";
+        actionEl.innerText = "توصیه اکید به انجام آرتوسنتز و آنالیز مایع مفصلی برای مشاهده کریستال یا انجام سونوگرافی/DECT.";
+        scoreBarEl.className = "bg-amber-400 h-full rounded-full transition-all duration-300";
+      } else {
+        badgeEl.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-500 text-slate-950 border border-emerald-400";
+        badgeEl.innerText = "احتمال بالا (High Probability ≥ 8)";
+        interpEl.innerText = "شیوع نقرس در این گروه بیش از ۸۲.۵٪ است. احتمال تشخیصی نقرس بالاست.";
+        actionEl.innerText = "می‌توان درمان حمله حاد نقرس را آغاز کرد؛ با این حال آرتوسنتز همچنان استاندارد طلایی است.";
+        scoreBarEl.className = "bg-emerald-400 h-full rounded-full transition-all duration-300";
+      }
+    }
+
+    // FLASHCARDS DATA & CONTROLS
+    const cardsData = [
+      {
+        category: "تشخیص",
+        q: "نمای تشخیصی اختصاصی نقرس در سونوگرافی مفصل چیست؟",
+        a: "علامت خط دوتایی (Double Contour Sign - DCS) که ناشی از رسوب خطی هیپراکوی کریستال‌های اورات روی غضروف مفصلی است."
+      },
+      {
+        category: "درمان دارویی",
+        q: "دوز صحیح کلشیسین در شروع حمله حاد نقرس چیست؟",
+        a: "۱.۲ میلی‌گرم در ابتدا، سپس ۰.۶ میلی‌گرم ۱ ساعت بعد (جمعاً ۱.۸ میلی‌گرم در روز اول). دوزهای بالای قدیمی دیگر توصیه نمی‌شوند."
+      },
+      {
+        category: "هدف درمانی (ULT)",
+        q: "هدف درمانی اسید اوریک سرم در بیمار مبتلا به نقرس توفوسی چیست؟",
+        a: "رساندن اسید اوریک سرم به زیر 5.0 mg/dL (300 µmol/L) جهت حل شدن سریع‌تر توفوس‌ها."
+      },
+      {
+        category: "تداخلات دارویی",
+        q: "چرا تجویز همزمان آلوپورینول و آزاتیوپرین خطرساز است؟",
+        a: "زیرا آلوپورینول انزیم گزانتین اکسیداز را مهار می‌کند که مسئول متابولیسم آزاتیوپرین است؛ این امر موجب مسمومیت شدید و سرکوب مغز استخوان می‌شود."
+      },
+      {
+        category: "عوارض کلیوی",
+        q: "مهم‌ترین عامل خطر تشکیل سنگ‌های کلیوی اسید اوریکی چیست؟",
+        a: "پایین بودن مداوم pH ادرار (ادرار اسیدی زیر 5.5). درمان اصلی قلیایی‌سازی ادرار با پتاسیم سیترات است."
+      },
+      {
+        category: "تست‌های ژنتیکی",
+        q: "قبل از شروع آلوپورینول در کدام نژادها تست آلل HLA-B*5801 توصیه می‌شود؟",
+        a: "در بیماران با نژاد هان چینی، تایلندی و بیماران کره‌ای مبتلا به بیماری مزمن کلیوی جهت پیشگیری از واکنش شدید پوستی (AHS)."
+      }
+    ];
+
+    let currentCardIndex = 0;
+
+    function updateCardUI() {
+      const data = cardsData[currentCardIndex];
+      document.getElementById('card-category').innerText = data.category;
+      document.getElementById('card-question').innerText = data.q;
+      document.getElementById('card-answer').innerText = data.a;
+      document.getElementById('card-counter').innerText = `${currentCardIndex + 1} از ${cardsData.length}`;
+      document.getElementById('flashcard').classList.remove('flipped');
+    }
+
+    function flipCard() {
+      document.getElementById('flashcard').classList.toggle('flipped');
+    }
+
+    function nextCard() {
+      if (currentCardIndex < cardsData.length - 1) {
+        currentCardIndex++;
+        updateCardUI();
+      }
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        updateCardUI();
+      }
+    }
+
+    // QUIZ DATA & CONTROLS
+    const quizQuestions = [
+      {
+        topic: "مدیریت پیوند و نقرس",
+        q: "مرد ۵۵ ساله‌ای با سابقه پیوند کلیه (در حال مصرف سیکلوسپورین) با آرتریت حاد مفصل اول متاتارسوفالانژال مراجعه کرده است. کدام گزینه برای درمان حمله حاد در این بیمار ترجیح داده می‌شود؟",
+        options: [
+          "تجویز کلشیسین با دوز استاندارد ۱.۲ میلی‌گرم سپس ۰.۶ میلی‌گرم هر ۲ ساعت",
+          "استفاده از دوزهای کوتاه مدت کورتیکواستروئید (خوراکی یا تزریق داخل مفصلی) یا کلشیسین تک‌دوز ۰.۶ mg",
+          "شروع سریع آلوپورینول با دوز 300 mg daily",
+          "تجویز دوز بالای ایندومتاسین به مدت ۲ هفته"
+        ],
+        correct: 1,
+        exp: "پاسخ صحیح گزینه ۲ است. سیکلوسپورین با کلشیسین تداخل داشته و خطر میونوروپاتی شدید را افزایش می‌دهد (کلشیسین باید محدود به تک دوز 0.6mg شود). NSAIDs نیز می‌توانند سمیت کلیوی سیکلوسپورین را تشدید کنند. استروئیدها ایمن‌ترین گزینه برای حمله حاد در پیوندی‌ها هستند."
+      },
+      {
+        topic: "تفسیر آزمایشگاهی",
+        q: "بیمار ۴۵ ساله‌ای با آرتریت حاد متورم و دردناک زانو مراجعه کرده است. اسید اوریک سرم ۵.۴ mg/dL گزارش شده است. کدام تفسیر صحیح است؟",
+        options: [
+          "تشخیص نقرس کاملاً رد می‌شود زیرا اسید اوریک زیر ۶.۸ است.",
+          "تا ۴۳٪ بیماران در زمان حمله حاد دارای سطح اسید اوریک نرمال یا پایین هستند.",
+          "بیمار قطعا دچار آرتریت سپتیک است و نیازی به آرتوسنتز ندارد.",
+          "سطح اسید اوریک در حمله حاد همیشه بالاترین حد ممکن است."
+        ],
+        correct: 1,
+        exp: "پاسخ صحیح گزینه ۲ است. در زمان حمله حاد، به علت دفع ادراری سیتوکینی یا رسوب اورات، سطح اسید اوریک سرم در ۱۲ تا ۴۳ درصد بیماران نرمال یا حتی پایین است. اندازه گیری دقیق اسید اوریک پایه باید ۲ هفته پس از رفع کامل حمله انجام شود."
+      },
+      {
+        topic: "درمان کاهش‌دهنده اسید اوریک (ULT)",
+        q: "کدام یک از اندیکاسیون‌های قطعی شروع درمان کاهش‌دهنده اسید اوریک (ULT) محسوب می‌شود؟",
+        options: [
+          "وجود یک بار هیپراوریسمی بدون علامت (اسید اوریک 7.5 mg/dL)",
+          "سابقه ۲ یا بیشتر حمله نقرس در سال یا وجود توفوس بالینی/رادیوگرافی",
+          "آرتریت روماتوئید بدون درگیری مفصل پا",
+          "سطح اسید اوریک 6.9 mg/dL در چکاپ روتین سالانه"
+        ],
+        correct: 1,
+        exp: "پاسخ صحیح گزینه ۲ است. اندیکاسیون‌های اصلی ULT شامل حملات مکرر (≥2 بار در سال)، وجود توفوس، اروزیون استخوانی در تصویربرداری، CKD مرحله ۳ یا بالاتر و سنگ‌های کلیوی عودکننده است. هیپراوریسمی بدون علامت نیازی به داروی ULT ندارد."
+      },
+      {
+        topic: "سنگ‌های کلیوی",
+        q: "خط اول درمان برای پیشگیری و حل کردن سنگ‌های کلیوی اسید اوریکی خالص چیست؟",
+        options: [
+          "سدیم کلراید خوراکی و دیورتیک تیازیوی",
+          "قلیایی‌سازی ادرار (با پتاسیم سیترات) تا هدف pH بین 6.5 تا 7.0 همراه با افزایش مصرف مایعات",
+          "سنگ‌شکنی برون‌پیکری (ESWL) بلافاصه پس از تشخیص",
+          "اسیدی کردن ادرار با ویتامین C دوز بالا"
+        ],
+        correct: 1,
+        exp: "پاسخ صحیح گزینه ۲ است. سنگ‌های اسید اوریکی در pH اسیدی (زیر ۵.۵) تشکیل می‌شوند. قلیایی‌سازی ادرار با پتاسیم سیترات تا هدف pH حدود ۶.۵ الی ۷.۰ همراه با هیدراتاسیون مناسب (حجم ادرار بالای ۲ لیتر) می‌تواند سنگ‌های خالص اسید اوریک را به طور کامل حل کند."
+      }
+    ];
+
+    let quizIndex = 0;
+    let quizScore = 0;
+    let answered = false;
+
+    function renderQuiz() {
+      answered = false;
+      const q = quizQuestions[quizIndex];
+      document.getElementById('quiz-progress-text').innerText = `سوال ${quizIndex + 1} از ${quizQuestions.length}`;
+      document.getElementById('quiz-topic').innerText = q.topic;
+      document.getElementById('quiz-question').innerText = q.q;
+
+      const optionsEl = document.getElementById('quiz-options');
+      optionsEl.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-right p-3.5 rounded-2xl border border-slate-200/90 bg-slate-50/70 hover:bg-slate-100/90 text-xs font-medium transition flex items-center justify-between";
+        btn.innerHTML = `<span>${opt}</span><span class="w-6 h-6 rounded-lg bg-slate-200/80 text-slate-700 flex items-center justify-center text-[11px] font-mono font-bold flex-shrink-0 mr-2">${idx + 1}</span>`;
+        btn.onclick = () => selectQuizAnswer(idx);
+        optionsEl.appendChild(btn);
+      });
+
+      document.getElementById('quiz-explanation').classList.add('hidden');
+      document.getElementById('next-quiz-btn').classList.add('hidden');
+    }
+
+    function selectQuizAnswer(selectedIndex) {
+      if (answered) return;
+      answered = true;
+
+      const q = quizQuestions[quizIndex];
+      const optionsBtns = document.getElementById('quiz-options').children;
+
+      if (selectedIndex === q.correct) {
+        quizScore++;
+        optionsBtns[selectedIndex].className = "w-full text-right p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 text-xs font-bold flex items-center justify-between shadow-sm";
+      } else {
+        optionsBtns[selectedIndex].className = "w-full text-right p-3.5 rounded-2xl border-2 border-rose-500 bg-rose-50 text-rose-950 text-xs font-bold flex items-center justify-between shadow-sm";
+        optionsBtns[q.correct].className = "w-full text-right p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-950 text-xs font-bold flex items-center justify-between shadow-sm";
+      }
+
+      document.getElementById('quiz-score').innerText = `${quizScore} / ${quizQuestions.length}`;
+
+      const expEl = document.getElementById('quiz-explanation');
+      expEl.innerText = q.exp;
+      expEl.classList.remove('hidden');
+
+      if (quizIndex < quizQuestions.length - 1) {
+        document.getElementById('next-quiz-btn').classList.remove('hidden');
+      }
+    }
+
+    function nextQuestion() {
+      if (quizIndex < quizQuestions.length - 1) {
+        quizIndex++;
+        renderQuiz();
+      }
+    }
+
+    // INITIALIZATION ON DOM READY
+    window.onload = function() {
+      calculateGoutScore();
+      updateCardUI();
+      renderQuiz();
+    };
+  </script>
+</body>
+</html>
