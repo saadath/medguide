@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه تعاملی ایران‌شناسی | استان‌ها و شهرها</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Vazirmatn Font CDN -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS & JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Vazirmatn', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+    }
+    /* 3D Card Flip Animation */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    
+    /* Leaflet customization for dark mode and RTL */
+    .leaflet-popup-content-wrapper {
+      font-family: 'Vazirmatn', sans-serif;
+      direction: rtl;
+      text-align: right;
+      border-radius: 12px;
+    }
+    .dark .leaflet-tile {
+      filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+    }
+    .leaflet-container {
+      font-family: 'Vazirmatn', sans-serif;
+      z-index: 10;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 space-x-reverse">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+          <i class="fa-solid fa-map-location-dot text-xl"></i>
+        </div>
+        <span class="font-bold text-lg md:text-xl bg-gradient-to-l from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
+          ایران‌شناسی تعاملی
+        </span>
+      </div>
+
+      <!-- Desktop Nav Buttons -->
+      <nav class="hidden md:flex items-center space-x-1 space-x-reverse bg-slate-100 dark:bg-slate-700/50 p-1 rounded-xl">
+        <button onclick="switchTab('explore')" id="nav-explore" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2">
+          <i class="fa-solid fa-compass"></i> مرور و کاوش
+        </button>
+        <button onclick="switchTab('flashcards')" id="nav-flashcards" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2">
+          <i class="fa-solid fa-clone"></i> فلش کارت
+        </button>
+        <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap"></i> آزمون شهرها
+        </button>
+        <button onclick="switchTab('map')" id="nav-map" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2">
+          <i class="fa-solid fa-map"></i> نقشه تعاملی
+        </button>
+        <button onclick="switchTab('map-quiz')" id="nav-map-quiz" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2">
+          <i class="fa-solid fa-bullseye"></i> آزمون نقشه
+        </button>
+      </nav>
+
+      <!-- Right Controls: Dark mode toggle & mobile menu button -->
+      <div class="flex items-center gap-2">
+        <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition">
+          <i class="fa-solid fa-moon dark:hidden text-lg"></i>
+          <i class="fa-solid fa-sun hidden dark:block text-lg text-amber-400"></i>
+        </button>
+
+        <button id="mobile-menu-btn" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 pt-2 pb-4 space-y-1">
+      <button onclick="switchTab('explore')" class="mobile-nav-btn w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3">
+        <i class="fa-solid fa-compass w-5"></i> مرور و کاوش
+      </button>
+      <button onclick="switchTab('flashcards')" class="mobile-nav-btn w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3">
+        <i class="fa-solid fa-clone w-5"></i> فلش کارت آموزشی
+      </button>
+      <button onclick="switchTab('quiz')" class="mobile-nav-btn w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3">
+        <i class="fa-solid fa-graduation-cap w-5"></i> آزمون شهرها و استان‌ها
+      </button>
+      <button onclick="switchTab('map')" class="mobile-nav-btn w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3">
+        <i class="fa-solid fa-map w-5"></i> نقشه تعاملی ایران
+      </button>
+      <button onclick="switchTab('map-quiz')" class="mobile-nav-btn w-full text-right px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-3">
+        <i class="fa-solid fa-bullseye w-5"></i> چالش جانمایی روی نقشه
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- 1. SECTION: EXPLORE (مرور و جستجو) -->
+    <section id="section-explore" class="tab-content">
+      <!-- Search & Filters -->
+      <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-700 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search input -->
+          <div class="relative md:col-span-2">
+            <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3.5 text-slate-400"></i>
+            <input type="text" id="search-input" placeholder="جستجوی نام استان یا شهر (مثلا: اصفهان، طبس، رشت)..." 
+                   class="w-full pr-10 pl-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+          </div>
+          <!-- Province Filter -->
+          <div>
+            <select id="province-filter" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+              <option value="ALL">همه استان‌ها (۳۱ استان)</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span id="stats-summary">در حال بارگذاری اطلاعات...</span>
+          <button onclick="resetExploreFilters()" class="text-emerald-600 dark:text-emerald-400 hover:underline">بازنشانی فیلترها</button>
+        </div>
+      </div>
+
+      <!-- Province Cards Grid -->
+      <div id="provinces-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Dynamic Cards inserted here -->
+      </div>
+    </section>
+
+    <!-- 2. SECTION: FLASHCARDS (فلش کارت - فقط سوال شهر، پاسخ استان) -->
+    <section id="section-flashcards" class="tab-content hidden">
+      <div class="max-w-xl mx-auto text-center">
+        <!-- Flashcard Controls -->
+        <div class="flex items-center justify-between mb-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">
+            کارت <span id="fc-current" class="text-emerald-600 dark:text-emerald-400 font-bold">1</span> از <span id="fc-total">--</span>
+          </span>
+          <div class="flex gap-2 items-center">
+            <span class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-lg font-medium">
+              حالت: شهر ➔ استان
+            </span>
+            <button onclick="shuffleFlashcards()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition" title="بُردار کارت‌ها">
+              <i class="fa-solid fa-shuffle"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Flip Card -->
+        <div id="flashcard" onclick="flipCard()" class="perspective-1000 w-full h-80 cursor-pointer group mb-6">
+          <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-2xl">
+            <!-- Front (شهر) -->
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-700 p-6 flex flex-col justify-between items-center backface-hidden">
+              <span class="text-xs uppercase tracking-wider text-slate-400 font-bold">نام شهر چیست؟ این شهر در کدام استان است؟</span>
+              <div class="text-center">
+                <i class="fa-solid fa-city text-4xl text-emerald-500 mb-4 block"></i>
+                <h3 id="fc-front-text" class="text-3xl font-extrabold text-slate-800 dark:text-white">---</h3>
+              </div>
+              <span class="text-xs text-slate-400 flex items-center gap-1">
+                <i class="fa-solid fa-rotate"></i> برای مشاهده استان روی کارت کلیک کنید
+              </span>
+            </div>
+
+            <!-- Back (استان) -->
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-2xl p-6 flex flex-col justify-between items-center backface-hidden rotate-y-180">
+              <span class="text-xs uppercase tracking-wider text-emerald-200 font-bold">استان مربوطه</span>
+              <div class="text-center">
+                <i class="fa-solid fa-map-location-dot text-4xl text-emerald-200 mb-4 block"></i>
+                <span class="text-sm text-emerald-100 block mb-1">این شهر قرار دارد در:</span>
+                <h3 id="fc-back-text" class="text-3xl font-extrabold">---</h3>
+              </div>
+              <span class="text-xs text-emerald-200 flex items-center gap-1">
+                <i class="fa-solid fa-check"></i> پاسخ صحیح
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next / Prev Nav Buttons -->
+        <div class="flex items-center justify-between gap-4">
+          <button onclick="prevFlashcard()" class="flex-1 py-3 px-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right"></i> کارت قبلی
+          </button>
+          <button onclick="nextFlashcard()" class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+            کارت بعدی <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SECTION: QUIZ (آزمون متنی با اصلاح رنگ و خوانایی دکمه‌ها) -->
+    <section id="section-quiz" class="tab-content hidden max-w-2xl mx-auto">
+      <!-- Quiz Setup Card -->
+      <div id="quiz-setup" class="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+        <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">آزمون جامع جغرافیای ایران</h2>
+        <p class="text-slate-600 dark:text-slate-400 text-sm mb-6">میزان تسلط خود را روی استان‌ها و شهرهای کشور بسنجید.</p>
+
+        <div class="space-y-4 text-right mb-6">
+          <div>
+            <label class="block text-sm font-medium mb-1">نوع سوالات آزمون:</label>
+            <select id="quiz-mode-select" class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+              <option value="city-to-province">شهر داده می‌شود ➔ استان را پیدا کنید</option>
+              <option value="province-to-city">استان داده می‌شود ➔ یکی از شهرهای آن را پیدا کنید</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">تعداد سوالات:</label>
+            <select id="quiz-length-select" class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+              <option value="10">۱۰ سوال</option>
+              <option value="20">۲۰ سوال</option>
+              <option value="30">۳۰ سوال</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="startQuiz()" class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-lg shadow-emerald-600/25">
+          شروع آزمون
+        </button>
+      </div>
+
+      <!-- Quiz Active State -->
+      <div id="quiz-active" class="hidden bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <!-- Progress bar -->
+        <div class="mb-6">
+          <div class="flex justify-between text-xs text-slate-500 mb-1">
+            <span>سوال <span id="q-current-num">1</span> از <span id="q-total-num">10</span></span>
+            <span>امتیاز: <span id="q-score" class="font-bold text-emerald-600">0</span></span>
+          </div>
+          <div class="w-full bg-slate-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+            <div id="q-progress" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <!-- Question Prompt -->
+        <div class="text-center my-6">
+          <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider" id="q-label-sub">سوال</span>
+          <h3 class="text-2xl sm:text-3xl font-extrabold mt-2 mb-1" id="q-question-text">---</h3>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="q-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          <!-- 4 option buttons rendered here -->
+        </div>
+
+        <!-- Quiz Navigation / Feedback -->
+        <div id="q-feedback" class="hidden p-4 rounded-xl mb-4 text-center text-sm font-bold"></div>
+        <button id="q-next-btn" onclick="nextQuestion()" class="hidden w-full py-3 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold">
+          سوال بعدی <i class="fa-solid fa-arrow-left mr-1"></i>
+        </button>
+      </div>
+
+      <!-- Quiz Results -->
+      <div id="quiz-results" class="hidden bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+        <div class="w-20 h-20 bg-amber-100 dark:bg-amber-900/40 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-1">نتیجه آزمون</h2>
+        <p class="text-slate-500 text-sm mb-6">عملکرد شما در این آزمون ثبت شد</p>
+
+        <div class="text-5xl font-black text-emerald-600 dark:text-emerald-400 mb-2" id="res-score-percentage">
+          0%
+        </div>
+        <p class="text-slate-600 dark:text-slate-300 mb-6" id="res-score-detail">
+          تعداد پاسخ‌های صحیح: ۰ از ۱۰
+        </p>
+
+        <button onclick="resetQuiz()" class="px-6 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition">
+          شرکت مجدد در آزمون
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. SECTION: MAP INTERACTIVE (پیاده‌سازی کامل با Leaflet JS) -->
+    <section id="section-map" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800/80">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-map-location-dot text-sm"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-slate-800 dark:text-white">
+                  نقشه تعاملی Leaflet ایران
+                </h3>
+                <p class="text-xs text-slate-500">روی هر یک از مارکرهای استان کلیک کنید تا اطلاعات و شهرهای آن نمایش داده شود</p>
+              </div>
+            </div>
+            <button onclick="resetLeafletMap()" class="text-xs px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-slate-50">
+              <i class="fa-solid fa-arrows-to-dot ml-1"></i> نما کل
+            </button>
+          </div>
+
+          <!-- Leaflet Map Element Container -->
+          <div id="leaflet-map" class="w-full h-[500px] z-10"></div>
+        </div>
+
+        <!-- Selected Province Details Card -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-24">
+          <div id="map-selected-info">
+            <div class="text-center py-12 text-slate-400">
+              <div class="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 mx-auto flex items-center justify-center mb-4">
+                <i class="fa-solid fa-map-pin text-2xl"></i>
+              </div>
+              <h4 class="font-bold text-slate-700 dark:text-slate-200 mb-1">هیچ استانی انتخاب نشده است</h4>
+              <p class="text-xs text-slate-500">روی یکی از علامت‌های استان روی نقشه Leaflet کلیک کنید تا جزئیات نمایش داده شود.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECTION: MAP QUIZ (آزمون Leaflet روی نقشه) -->
+    <section id="section-map-quiz" class="tab-content hidden max-w-4xl mx-auto">
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <!-- Header / Control -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200 dark:border-slate-700">
+          <div>
+            <h2 class="text-xl font-bold flex items-center gap-2">
+              <i class="fa-solid fa-bullseye text-red-500"></i> چالش جانمایی روی نقشه Leaflet
+            </h2>
+            <p class="text-xs text-slate-500">استان خواسته شده را روی نقشه Leaflet پیدا کنید و روی پین آن کلیک کنید.</p>
+          </div>
+          <div id="mq-score-board" class="flex items-center gap-4 text-sm font-bold bg-slate-100 dark:bg-slate-700/60 px-4 py-2 rounded-xl">
+            <span>امتیاز: <span id="mq-score" class="text-emerald-600 dark:text-emerald-400">0</span></span>
+            <span>باقی‌مانده: <span id="mq-remaining">10</span></span>
+          </div>
+        </div>
+
+        <!-- Target Question Box -->
+        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 rounded-xl text-center mb-4 shadow-md shadow-emerald-500/20">
+          <span class="text-xs text-emerald-100 uppercase tracking-wider block">روی پین استان زیر کلیک کنید:</span>
+          <h3 id="mq-target-province" class="text-3xl font-extrabold mt-1">استان ...</h3>
+        </div>
+
+        <!-- Leaflet Quiz Map Container -->
+        <div id="leaflet-quiz-map" class="w-full h-[450px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner z-10"></div>
+
+        <!-- Feedback alert -->
+        <div id="mq-feedback" class="mt-4 hidden p-3 rounded-xl text-center font-bold text-sm"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      سامانه تعاملی آموزش و یادگیری استان‌ها و شهرهای ایران • طراحی شده با تکنولوژی‌های مدرن وب
+    </div>
+  </footer>
+
+  <!-- SCRIPT section -->
+  <script>
+    // --- 1. DATA PROCESSING ---
+    const rawData = [
+      {"province":"اردبیل","cities":["اردبیل","اصلاندوز","آبی بیگلو","بیله سوار","پارس آباد","تازه کند","تازه کندانگوت","جعفرآباد","خلخال","رضی","سرعین","عنبران","فخرآباد","کلور","کوراییم","گرمی","گیوی","لاهرود","مرادلو","مشگین شهر","نمین","نیر","هشتجین","هیر"]},
+      {"province":"اصفهان","cities":["ابریشم","ابوزیدآباد","اردستان","اژیه","اصفهان","افوس","انارک","ایمانشهر","آران وبیدگل","بادرود","باغ بهادران","بافران","برزک","برف انبار","بوئین ومیاندشت","بهاران شهر","بهارستان","پیربکران","تودشک","تیران","جندق","جوزدان","جوشقان وکامو","چادگان","چرمهین","چمگردان","حبیب آباد","حسن آباد","حنا","خالدآباد","خمینی شهر","خوانسار","خور","خوراسگان","خورزوق","داران","دامنه","درچه پیاز","دستگرد","دولت آباد","دهاقان","دهق","دیزیچه","رزوه","رضوانشهر","زاینده رود","زرین شهر","زواره","زیباشهر","سده لنجان","سفیدشهر","سگزی","سمیرم","شاپورآباد","شاهین شهر","شهرضا","طالخونچه","عسگران","علویچه","فرخی","فریدونشهر","فلاورجان","فولادشهر","قمصر","قهجاورستان","قهدریجان","کاشان","کرکوند","کلیشادوسودرجان","کمشچه","کمه","کوشک","کوهپایه","کهریزسنگ","گرگاب","گزبرخوار","گلپایگان","گلدشت","گلشن","گلشهر","گوگد","لای بید","مبارکه","محمدآباد","مشکات","منظریه","مهاباد","میمه","نائین","نجف آباد","نصرآباد","نطنز","نوش آباد","نیاسر","نیک آباد","ورزنه","ورنامخواست","وزوان","ونک","هرند"]},
+      {"province":"البرز","cities":["اشتهارد","آسارا","تنکمان","چهارباغ","سیف آباد","شهرجدیدهشتگرد","طالقان","کرج","کمال شهر","کوهسار","گرمدره","ماهدشت","محمدشهر","مشکین دشت","نظرآباد","هشتگرد"]},
+      {"province":"ایلام","cities":["ارکواز","ایلام","ایوان","آبدانان","آسمان آباد","بدره","پهله","توحید","چوار","دره شهر","دلگشا","دهلران","زرنه","سراب باغ","سرابله","صالح آباد","لومار","مورموری","موسیان","مهران","میمه"]},
+      {"province":"آذربایجان شرقی","cities":["اسکو","اهر","ایلخچی","آبش احمد","آذرشهر","آقکند","باسمنج","بخشایش","بستان آباد","بناب","بناب جدید","تبریز","ترک","ترکمانچای","تسوج","تیکمه داش","جلفا","خاروانا","خامنه","خراجو","خسروشهر","خمارلو","خواجه","دوزدوزان","زرنق","زنوز","سراب","سردرود","سیس","سیه رود","شبستر","شربیان","شرفخانه","شندآباد","شهرجدیدسهند","صوفیان","عجب شیر","قره آغاج","کشکسرای","کلوانق","کلیبر","کوزه کنان","گوگان","لیلان","مراغه","مرند","ملکان","ممقان","مهربان","میانه","نظرکهریزی","وایقان","ورزقان","هادیشهر","هریس","هشترود","هوراند","یامچی"]},
+      {"province":"آذربایجان غربی","cities":["ارومیه","اشنویه","ایواوغلی","آواجیق","باروق","بازرگان","بوکان","پلدشت","پیرانشهر","تازه شهر","تکاب","چهاربرج","خلیفان","خوی","دیزج دیز","ربط","سردشت","سرو","سلماس","سیلوانه","سیمینه","سیه چشمه","شاهین دژ","شوط","فیرورق","قره ضیاءالدین","قطور","قوشچی","کشاورز","گردکشانه","ماکو","محمدیار","محمودآباد","مهاباد","میاندوآب","میرآباد","نالوس","نقده","نوشین"]},
+      {"province":"بوشهر","cities":["امام حسن","انارستان","اهرم","آبپخش","آبدان","برازجان","بردخون","بردستان","بندردیر","بندردیلم","بندرریگ","بندرکنگان","بندرگناوه","بنک","بوشهر","تنگ ارم","جم","چغادک","خارک","خورموج","دالکی","دلوار","ریز","سعدآباد","سیراف","شبانکاره","شنبه","عسلویه","کاکی","کلمه","نخل تقی","وحدتیه"]},
+      {"province":"تهران","cities":["ارجمند","اسلامشهر","اندیشه","آبسرد","آبعلی","باغستان","باقرشهر","بومهن","پاکدشت","پردیس","پیشوا","تجریش","تهران","جوادآباد","چهاردانگه","حسن آباد","دماوند","رباط کریم","رودهن","ری","شاهدشهر","شریف آباد","شهریار","صالح آباد","صباشهر","صفادشت","فردوسیه","فرون آباد","فشم","فیروزکوه","قدس","قرچک","کهریزک","کیلان","گلستان","لواسان","ملارد","نسیم شهر","نصیرآباد","وحیدیه","ورامین"]},
+      {"province":"چهارمحال وبختیاری","cities":["اردل","آلونی","باباحیدر","بروجن","بلداجی","بن","جونقان","چلگرد","سامان","سفیددشت","سودجان","سورشجان","شلمزار","شهرکرد","طاقانک","فارسان","فرادنبه","فرخ شهر","کیان","گندمان","گهرو","لردگان","مال خلیفه","ناغان","نافچ","نقنه","هفشجان"]},
+      {"province":"خراسان جنوبی","cities":["ارسک","اسدیه","اسفدن","اسلامیه","آرین شهر","آیسک","بشرویه","بیرجند","حاجی آباد","خضری دشت بیاض","خوسف","زهان","سرایان","سربیشه","سه قلعه","شوسف","طبس مسینا","فردوس","قائن","قهستان","گزیک","محمد شهر","مود","نهبندان","نیمبلوک"]},
+      {"province":"خراسان رضوی","cities":["احمدآبادصولت","انابد","باجگیران","باخرز","بار","بایگ","بجستان","بردسکن","بیدخت","تایباد","تربت جام","تربت حیدریه","جغتای","جنگل","چاپشلو","چکنه","چناران","خرو","خلیل آباد","خواف","داورزن","درگز","درود","دولت آباد","رباط سنگ","رشتخوار","رضویه","روداب","ریوش","سبزوار","سرخس","سفیدسنگ","سلامی","سلطان آباد","سنگان","شادمهر","شاندیز","ششتمد","شهرآباد","شهرزو","صالح آباد","طرقبه","عشق آباد","فرهادگرد","فریمان","فیروزه","فیض آباد","قاسم آباد","قدمگاه","قلندرآباد","قوچان","کاخک","کاریز","کاشمر","کدکن","کلات","کندر","گلمکان","گناباد","لطف آباد","مزدآوند","مشهد","مشهدریزه","ملک آباد","نشتیفان","نصر آباد","نقاب","نوخندان","نیشابور","نیل شهر","همت آباد","یونسی"]},
+      {"province":"خراسان شمالی","cities":["اسفراین","ایور","آشخانه","بجنورد","پیش قلعه","تیتکانلو","جاجرم","حصارگرمخان","درق","راز","سنخواست","شوقان","شیروان","صفی آباد","فاروج","قاضی","گرمه","لوجلی"]},
+      {"province":"خوزستان","cities":["اروندکنار","الوان","امیدیه","اندیمشک","اهواز","ایذه","آبادان","آغاجاری","باغ ملک","بستان","بندرامام خمینی","بندرماهشهر","بهبهان","ترکالکی","جایزان","جنت مکان","چغامیش","چمران","چوئبده","حر","حسینیه","حمزه","حمیدیه","خرمشهر","دارخوین","دزآب","دزفول","دهدز","رامشیر","رامهرمز","رفیع","زهره","سالند","سردشت","سماله","سوسنگرد","شادگان","شاوور","شرافت","شوش","شوشتر","شیبان","صالح شهر","صالح مشطط","صفی آباد","صیدون","قلعه تل","قلعه خواجه","گتوند","گوریه","لالی","مسجدسلیمان","مشراگه","مقاومت","ملاثانی","میانرود","میداود","مینوشهر","ویس","هفتگل","هندیجان","هویزه"]},
+      {"province":"زنجان","cities":["ابهر","ارمغانخانه","آب بر","چورزق","حلب","خرمدره","دندی","زرین آباد","زرین رود","زنجان","سجاس","سلطانیه","سهرورد","صائین قلعه","قیدار","گرماب","ماه نشان","هیدج"]},
+      {"province":"سمنان","cities":["امیریه","ایوانکی","آرادان","بسطام","بیارجمند","دامغان","درجزین","دیباج","سرخه","سمنان","شاهرود","شهمیرزاد","کلاته خیج","گرمسار","مجن","مهدی شهر","میامی"]},
+      {"province":"سیستان وبلوچستان","cities":["ادیمی","اسپکه","ایرانشهر","بزمان","بمپور","بنت","بنجار","پیشین","جالق","چاه بهار","خاش","دوست محمد","راسک","زابل","زابلی","زاهدان","زرآباد","زهک","سراوان","سرباز","سوران","سیرکان","علی اکبر","فنوج","قصرقند","کنارک","گشت","گلمورتی","محمدان","محمد آباد","محمدی","میرجاوه","نصرت آباد","نگور","نوک آباد","نیک شهر","هیدوج"]},
+      {"province":"فارس","cities":["اردکان","ارسنجان","استهبان","اسیر","اشکنان","افزر","اقلید","امام شهر","اوز","اهل","ایج","ایزدخواست","آباده","آباده طشک","باب انار","بالاده","بنارویه","بوانات","بهمن","بیرم","بیضا","جنت شهر","جویم","جهرم","حاجی آباد","حسامی","حسن آباد","خانه زنیان","خاوران","خرامه","خشت","خنج","خور","خومه زار","داراب","داریان","دبیران","دژکرد","دوبرجی","دوزه","دهرم","رامجرد","رونیز","زاهدشهر","زرقان","سده","سروستان","سعادت شهر","سورمق","سیدان","ششده","شهر جدید صدرا","شهرپیر","شیراز","صغاد","صفاشهر","علامرودشت","عمادده","فدامی","فراشبند","فسا","فیروزآباد","قادرآباد","قائمیه","قطب آباد","قطرویه","قیر","کارزین","کازرون","کامفیروز","کره ای","کنارتخته","کوار","کوهنجان","گراش","گله دار","لار","لامرد","لپوئی","لطیفی","مبارک آباد","مرودشت","مشکان","مصیری","مهر","میمند","نوبندگان","نوجین","نودان","نورآباد","نی ریز","وراوی","هماشهر"]},
+      {"province":"قزوین","cities":["ارداق","اسفرورین","اقبالیه","الوند","آبگرم","آبیک","آوج","بوئین زهرا","بیدستان","تاکستان","خاکعلی","خرمدشت","دانسفهان","رازمیان","سگزآباد","سیردان","شال","شریفیه","ضیاءآباد","قزوین","کوهین","محمدیه","محمودآبادنمونه","معلم کلایه","نرجه"]},
+      {"province":"قم","cities":["جعفریه","دستجرد","سلفچگان","قم","قنوات","کهک"]},
+      {"province":"کردستان","cities":["آرمرده","بابارشانی","بانه","بلبان آباد","بوئین سفلی","بیجار","چناره","دزج","دلبران","دهگلان","دیواندره","زرینه","سروآباد","سریش آباد","سقز","سنندج","شویشه","صاحب","قروه","کامیاران","کانی دینار","کانی سور","مریوان","موچش","یاسوکند"]},
+      {"province":"کرمان","cities":["اختیارآباد","ارزوئیه","امین شهر","انار","اندوهجرد","باغین","بافت","بردسیر","بروات","بزنجان","بم","بهرمان","پاریز","جبالبارز","جوپار","جوزم","جیرفت","چترود","خاتون آباد","خانوک","خورسند","درب بهشت","دوساری","دهج","رابر","راور","راین","رفسنجان","رودبار","ریحان شهر","زرند","زنگی آباد","زیدآباد","سرچشمه","سیرجان","شهداد","شهربابک","صفائیه","عنبرآباد","فاریاب","فهرج","قلعه گنج","کاظم آباد","کرمان","کشکوئیه","کوهبنان","کهنوج","کیانشهر","گلباف","گلزار","لاله زار","ماهان","محمد آباد","محی آباد","مردهک","منوجان","نجف شهر","نرماشیر","نظام شهر","نگار","نودژ","هجدک","هماشهر","یزدان شهر"]},
+      {"province":"کرمانشاه","cities":["ازگله","اسلام آبادغرب","باینگان","بیستون","پاوه","تازه آباد","جوانرود","حمیل","رباط","روانسر","سرپل ذهاب","سرمست","سطر","سنقر","سومار","شاهو","صحنه","قصرشیرین","کرمانشاه","کرندغرب","کنگاور","کوزران","گهواره","گیلانغرب","میان راهان","نودشه","نوسود","هرسین","هلشی"]},
+      {"province":"کهگیلویه وبویراحمد","cities":["باشت","پاتاوه","چرام","چیتاب","دوگنبدان","دهدشت","دیشموک","سوق","سی سخت","قلعه رئیسی","گراب سفلی","لنده","لیکک","مادوان","مارگون","یاسوج"]},
+      {"province":"گلستان","cities":["انبارآلوم","اینچه برون","آزادشهر","آق قلا","بندرگز","ترکمن","جلین","خان ببین","دلند","رامیان","سرخنکلاته","سیمین شهر","علی آباد","فاضل آباد","کردکوی","کلاله","گالیکش","گرگان","گمیش تپه","گنبد کاووس","مراوه تپه","مینودشت","نگین شهر","نوده خاندوز","نوکنده"]},
+      {"province":"گیلان","cities":["احمدسرگوراب","اسالم","اطاقور","املش","آستارا","آستانه اشرفیه","بازارجمعه","بره سر","بندرانزلی","پره سر","توتکابن","جیرنده","چابکسر","چاف وچمخاله","چوبر","حویق","خشکبیجار","خمام","دیلمان","رانکوه","رحیم آباد","رستم آباد","رشت","رضوانشهر","رودبار","رودبنه","رودسر","سنگر","سیاهکل","شفت","شلمان","صومعه سرا","فومن","کلاچای","کوچصفهان","کومله","کیاشهر","گوراب زرمیخ","لاهیجان","لشت نشاء","لنگرود","لوشان","لولمان","لوندویل","لیسار","ماسال","ماسوله","مرجقل","منجیل","واجارگاه","هشتپر"]},
+      {"province":"لرستان","cities":["ازنا","اشترینان","الشتر","الیگودرز","بروجرد","پلدختر","چالانچولان","چغلوندی","چقابل","خرم آباد","درب گنبد","دورود","زاغه","سپیددشت","سراب دوره","شول آباد","فیروز آباد","کونانی","کوهدشت","گراب","معمولان","مؤمن آباد","نور آباد","ویسیان","هفت چشمه"]},
+      {"province":"مازندران","cities":["امیرکلا","ایزدشهر","آلاشت","آمل","بابل","بابلسر","بلده","بهشهر","بهنمیر","پل سفید","پول","تنکابن","جویبار","چالوس","چمستان","خرم آباد","خلیل شهر","خوش رودپی","دابودشت","رامسر","رستمکلا","رویان","رینه","زرگر محله","زیرآب","ساری","سرخرود","سلمان شهر","سورک","شیرگاه","شیرود","عباس آباد","فریدونکنار","فریم","قائم شهر","کتالم وسادات شهر","کلارآباد","کلاردشت","کله بست","کوهی خیل","کیاسر","کیاکلا","گتاب","گزنک","گلوگاه","محمود آباد","مرزن آباد","مرزیکلا","نشتارود","نکا","نور","نوشهر"]},
+      {"province":"مرکزی","cities":["اراک","آستانه","آشتیان","پرندک","تفرش","توره","جاورسیان","خشکرود","خمین","خنداب","داودآباد","دلیجان","رازقان","زاویه","ساروق","ساوه","سنجان","شازند","شهرجدیدمهاجران","غرق آباد","فرمهین","قورچی باشی","کرهرود","کمیجان","مأمونیه","محلات","میلاجرد","نراق","نوبران","نیمور","هندودر"]},
+      {"province":"هرمزگان","cities":["ابوموسی","بستک","بندرجاسک","بندرچارک","بندرعباس","بندرلنگه","بیکاه","پارسیان","تخت","جناح","حاجی آباد","خمیر","درگهان","دهبارز","رویدر","زیارتعلی","سردشت بشاگرد","سرگز","سندرک","سوزا","سیریک","فارغان","فین","قشم","قلعه قاضی","کنگ","کوشکنار","کیش","گوهران","میناب","هرمز","هشتبندی"]},
+      {"province":"همدان","cities":["ازندریان","اسدآباد","برزول","بهار","تویسرکان","جورقان","جوکار","دمق","رزن","زنگنه","سامن","سرکان","شیرین سو","صالح آباد","فامنین","فرسفج","فیروزان","قروه در جزین","قهاوند","کبودرآهنگ","گل تپه","گیان","لالجین","مریانج","ملایر","نهاوند","همدان"]},
+      {"province":"یزد","cities":["ابرکوه","احمدآباد","اردکان","اشکذر","بافق","بفروئیه","بهاباد","تفت","حمیدیا","خضرآباد","دیهوک","زارچ","شاهدیه","طبس","عشق آباد","عقدا","مروست","مهردشت","مهریز","میبد","ندوشن","نیر","هرات","یزد"]}
+    ];
+
+    // Real Geographic Coordinates for 31 Provinces of Iran (Latitude, Longitude)
+    const provinceCoordinates = [
+      { name: "آذربایجان شرقی", lat: 38.0800, lng: 46.2919 },
+      { name: "آذربایجان غربی", lat: 37.5527, lng: 45.0761 },
+      { name: "اردبیل", lat: 38.2498, lng: 48.2933 },
+      { name: "اصفهان", lat: 32.6546, lng: 51.6680 },
+      { name: "البرز", lat: 35.8400, lng: 50.9391 },
+      { name: "ایلام", lat: 33.6374, lng: 46.4227 },
+      { name: "بوشهر", lat: 28.9234, lng: 50.8384 },
+      { name: "تهران", lat: 35.6892, lng: 51.3890 },
+      { name: "چهارمحال وبختیاری", lat: 32.3256, lng: 50.8644 },
+      { name: "خراسان جنوبی", lat: 32.8649, lng: 59.2262 },
+      { name: "خراسان رضوی", lat: 36.2972, lng: 59.6067 },
+      { name: "خراسان شمالی", lat: 37.4761, lng: 57.3317 },
+      { name: "خوزستان", lat: 31.3183, lng: 48.6706 },
+      { name: "زنجان", lat: 36.6736, lng: 48.4963 },
+      { name: "سمنان", lat: 35.5729, lng: 53.3971 },
+      { name: "سیستان وبلوچستان", lat: 29.4963, lng: 60.8629 },
+      { name: "فارس", lat: 29.5926, lng: 52.5836 },
+      { name: "قزوین", lat: 36.2688, lng: 50.0041 },
+      { name: "قم", lat: 34.6401, lng: 50.8764 },
+      { name: "کردستان", lat: 35.3144, lng: 46.9923 },
+      { name: "کرمان", lat: 30.2839, lng: 57.0834 },
+      { name: "کرمانشاه", lat: 34.3142, lng: 47.0650 },
+      { name: "کهگیلویه وبویراحمد", lat: 30.6682, lng: 51.5921 },
+      { name: "گلستان", lat: 36.8427, lng: 54.4439 },
+      { name: "گیلان", lat: 37.2808, lng: 49.5832 },
+      { name: "لرستان", lat: 33.4878, lng: 48.3558 },
+      { name: "مازندران", lat: 36.5659, lng: 53.0586 },
+      { name: "مرکزی", lat: 34.0954, lng: 49.7013 },
+      { name: "هرمزگان", lat: 27.1832, lng: 56.2666 },
+      { name: "همدان", lat: 34.7989, lng: 48.5150 },
+      { name: "یزد", lat: 31.8974, lng: 54.3675 }
+    ];
+
+    let allCitiesList = [];
+    rawData.forEach(item => {
+      item.cities.forEach(city => {
+        allCitiesList.push({ city: city, province: item.province });
+      });
+    });
+
+    // --- 2. STATE MANAGEMENT ---
+    let currentTab = 'explore';
+    let isDarkMode = false;
+    
+    // Leaflet Map Instances
+    let leafletMapInstance = null;
+    let leafletQuizMapInstance = null;
+    let mainMapMarkers = [];
+    let quizMapMarkers = [];
+
+    // Flashcard State
+    let fcIndex = 0;
+    let fcList = [...allCitiesList];
+    let isFcFlipped = false;
+
+    // Quiz State
+    let quizQuestions = [];
+    let currentQIndex = 0;
+    let quizScore = 0;
+
+    // Map Quiz State
+    let mqTargetProvince = null;
+    let mqScore = 0;
+    let mqRemaining = 10;
+
+    // --- 3. INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initExplore();
+      initFlashcards();
+      setupMobileMenu();
+    });
+
+    function initTheme() {
+      const toggleBtn = document.getElementById('theme-toggle');
+      toggleBtn.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      });
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`section-${tabId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'shadow-sm');
+        btn.classList.add('text-slate-600', 'dark:text-slate-300');
+      });
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if(activeBtn) {
+        activeBtn.classList.add('bg-white', 'dark:bg-slate-800', 'text-emerald-600', 'shadow-sm');
+        activeBtn.classList.remove('text-slate-600', 'dark:text-slate-300');
+      }
+
+      document.getElementById('mobile-menu').classList.add('hidden');
+
+      if (tabId === 'map') {
+        setTimeout(() => {
+          initLeafletMap();
+        }, 150);
+      }
+
+      if (tabId === 'map-quiz') {
+        setTimeout(() => {
+          initLeafletQuizMap();
+          if (!mqTargetProvince) {
+            startMapQuiz();
+          }
+        }, 150);
+      }
+    }
+
+    function setupMobileMenu() {
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+      });
+    }
+
+    // --- 4. EXPLORE SECTION ---
+    function initExplore() {
+      const select = document.getElementById('province-filter');
+      rawData.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.province;
+        opt.textContent = `استان ${item.province} (${item.cities.length} شهر)`;
+        select.appendChild(opt);
+      });
+
+      document.getElementById('search-input').addEventListener('input', filterExplore);
+      select.addEventListener('change', filterExplore);
+
+      renderExploreGrid(rawData);
+    }
+
+    function filterExplore() {
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const selectedProv = document.getElementById('province-filter').value;
+
+      let filtered = rawData.filter(item => {
+        const matchProv = selectedProv === 'ALL' || item.province === selectedProv;
+        if (!matchProv) return false;
+
+        if (!query) return true;
+
+        const provMatch = item.province.toLowerCase().includes(query);
+        const cityMatch = item.cities.some(c => c.toLowerCase().includes(query));
+        return provMatch || cityMatch;
+      });
+
+      renderExploreGrid(filtered, query);
+    }
+
+    function resetExploreFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('province-filter').value = 'ALL';
+      renderExploreGrid(rawData);
+    }
+
+    function renderExploreGrid(data, highlightQuery = '') {
+      const grid = document.getElementById('provinces-grid');
+      const stats = document.getElementById('stats-summary');
+      grid.innerHTML = '';
+
+      let totalCitiesDisplayed = 0;
+      data.forEach(d => totalCitiesDisplayed += d.cities.length);
+
+      stats.textContent = `نمایش ${data.length} استان و ${totalCitiesDisplayed} شهر`;
+
+      if (data.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <i class="fa-solid fa-magnifying-glass-location text-4xl text-slate-300 mb-3 block"></i>
+            <p class="text-slate-500 font-medium">هیچ نتیجه‌ای یافت نشد.</p>
+          </div>
+        `;
+        return;
+      }
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-700 hover:shadow-md transition duration-200 flex flex-col justify-between";
+        
+        let citiesBadgeHtml = item.cities.map(city => {
+          const isHighlighted = highlightQuery && city.toLowerCase().includes(highlightQuery);
+          return `<span class="inline-block text-xs px-2.5 py-1 rounded-lg ${isHighlighted ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 font-bold' : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300'}">${city}</span>`;
+        }).join(' ');
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-700/60 pb-3">
+              <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-emerald-500"></i> استان ${item.province}
+              </h3>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                ${item.cities.length} شهر
+              </span>
+            </div>
+            <div class="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1">
+              ${citiesBadgeHtml}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // --- 5. FLASHCARD LOGIC ---
+    function initFlashcards() {
+      shuffleFlashcards();
+    }
+
+    function shuffleFlashcards() {
+      fcList = [...allCitiesList].sort(() => Math.random() - 0.5);
+      fcIndex = 0;
+      updateFlashcardUI();
+    }
+
+    function updateFlashcardUI() {
+      isFcFlipped = false;
+      document.getElementById('flashcard-inner').classList.remove('rotate-y-180');
+
+      document.getElementById('fc-current').textContent = fcIndex + 1;
+      document.getElementById('fc-total').textContent = fcList.length;
+
+      const currentItem = fcList[fcIndex];
+      document.getElementById('fc-front-text').textContent = currentItem.city;
+      document.getElementById('fc-back-text').textContent = `استان ${currentItem.province}`;
+    }
+
+    function flipCard() {
+      isFcFlipped = !isFcFlipped;
+      const inner = document.getElementById('flashcard-inner');
+      if (isFcFlipped) {
+        inner.classList.add('rotate-y-180');
+      } else {
+        inner.classList.remove('rotate-y-180');
+      }
+    }
+
+    function nextFlashcard() {
+      if (fcIndex < fcList.length - 1) {
+        fcIndex++;
+        updateFlashcardUI();
+      }
+    }
+
+    function prevFlashcard() {
+      if (fcIndex > 0) {
+        fcIndex--;
+        updateFlashcardUI();
+      }
+    }
+
+    // --- 6. QUIZ LOGIC (با اصلاح رنگ متون دکمه‌ها) ---
+    function startQuiz() {
+      const mode = document.getElementById('quiz-mode-select').value;
+      const count = parseInt(document.getElementById('quiz-length-select').value);
+
+      quizScore = 0;
+      currentQIndex = 0;
+      quizQuestions = [];
+
+      let shuffledCities = [...allCitiesList].sort(() => Math.random() - 0.5).slice(0, count);
+
+      shuffledCities.forEach(item => {
+        let options = [];
+        let correctOpt = '';
+
+        if (mode === 'city-to-province') {
+          correctOpt = item.province;
+          options.push(correctOpt);
+          while(options.length < 4) {
+            let randProv = rawData[Math.floor(Math.random() * rawData.length)].province;
+            if (!options.includes(randProv)) options.push(randProv);
+          }
+        } else {
+          correctOpt = item.city;
+          options.push(correctOpt);
+          while(options.length < 4) {
+            let randCityObj = allCitiesList[Math.floor(Math.random() * allCitiesList.length)];
+            if (randCityObj.province !== item.province && !options.includes(randCityObj.city)) {
+              options.push(randCityObj.city);
+            }
+          }
+        }
+
+        options.sort(() => Math.random() - 0.5);
+
+        quizQuestions.push({
+          questionTarget: mode === 'city-to-province' ? item.city : item.province,
+          correctAnswer: correctOpt,
+          options: options,
+          mode: mode
+        });
+      });
+
+      document.getElementById('quiz-setup').classList.add('hidden');
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-active').classList.remove('hidden');
+
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      const q = quizQuestions[currentQIndex];
+      document.getElementById('q-current-num').textContent = currentQIndex + 1;
+      document.getElementById('q-total-num').textContent = quizQuestions.length;
+      document.getElementById('q-score').textContent = quizScore;
+
+      const progressPct = ((currentQIndex) / quizQuestions.length) * 100;
+      document.getElementById('q-progress').style.width = `${progressPct}%`;
+
+      const subLabel = document.getElementById('q-label-sub');
+      const qText = document.getElementById('q-question-text');
+
+      if (q.mode === 'city-to-province') {
+        subLabel.textContent = 'شهر زیر در کدام استان قرار دارد؟';
+        qText.textContent = `شهر ${q.questionTarget}`;
+      } else {
+        subLabel.textContent = 'کدام شهر زیر در این استان قرار دارد؟';
+        qText.textContent = `استان ${q.questionTarget}`;
+      }
+
+      const optionsDiv = document.getElementById('q-options');
+      optionsDiv.innerHTML = '';
+
+      document.getElementById('q-feedback').classList.add('hidden');
+      document.getElementById('q-next-btn').classList.add('hidden');
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        // Base styling for question option buttons with high readability
+        btn.className = "q-opt-btn p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-bold text-center hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800 transition duration-150";
+        btn.textContent = q.mode === 'city-to-province' ? `استان ${opt}` : opt;
+        btn.onclick = () => checkAnswer(opt, btn);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedOpt, clickedBtn) {
+      const q = quizQuestions[currentQIndex];
+      const allOptBtns = document.querySelectorAll('.q-opt-btn');
+      allOptBtns.forEach(b => b.disabled = true);
+
+      const feedback = document.getElementById('q-feedback');
+      feedback.classList.remove('hidden');
+
+      if (selectedOpt === q.correctAnswer) {
+        quizScore++;
+        // Fix contrast: green background with explicit white bold font
+        clickedBtn.className = "q-opt-btn p-4 rounded-xl border-2 border-emerald-600 bg-emerald-600 text-white font-black text-center shadow-md flex items-center justify-center gap-2";
+        clickedBtn.innerHTML = `${clickedBtn.textContent} <i class="fa-solid fa-circle-check"></i>`;
+        
+        feedback.className = "p-3 rounded-xl mb-4 text-center text-sm font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300";
+        feedback.innerHTML = '<i class="fa-solid fa-circle-check ml-1"></i> پاسخ شما صحیح است!';
+      } else {
+        // Fix contrast: red background for incorrect selection
+        clickedBtn.className = "q-opt-btn p-4 rounded-xl border-2 border-rose-600 bg-rose-600 text-white font-black text-center shadow-md flex items-center justify-center gap-2";
+        clickedBtn.innerHTML = `${clickedBtn.textContent} <i class="fa-solid fa-circle-xmark"></i>`;
+
+        // Highlight correct option in distinct green
+        allOptBtns.forEach(b => {
+          if (b.textContent.includes(q.correctAnswer)) {
+            b.className = "q-opt-btn p-4 rounded-xl border-2 border-emerald-500 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-200 font-black text-center shadow-md flex items-center justify-center gap-2";
+            b.innerHTML = `${b.textContent} <i class="fa-solid fa-check"></i>`;
+          }
+        });
+
+        feedback.className = "p-3 rounded-xl mb-4 text-center text-sm font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark ml-1"></i> نادرست! پاسخ صحیح: <strong>${q.correctAnswer}</strong>`;
+      }
+
+      document.getElementById('q-score').textContent = quizScore;
+      document.getElementById('q-next-btn').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      currentQIndex++;
+      if (currentQIndex < quizQuestions.length) {
+        renderQuizQuestion();
+      } else {
+        showQuizResults();
+      }
+    }
+
+    function showQuizResults() {
+      document.getElementById('quiz-active').classList.add('hidden');
+      const resContainer = document.getElementById('quiz-results');
+      resContainer.classList.remove('hidden');
+
+      const total = quizQuestions.length;
+      const pct = Math.round((quizScore / total) * 100);
+
+      document.getElementById('res-score-percentage').textContent = `${pct}%`;
+      document.getElementById('res-score-detail').textContent = `تعداد پاسخ‌های صحیح: ${quizScore} از ${total}`;
+    }
+
+    function resetQuiz() {
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-setup').classList.remove('hidden');
+    }
+
+    // --- 7. LEAFLET MAP IMPLEMENTATION ---
+    function initLeafletMap() {
+      if (leafletMapInstance) {
+        leafletMapInstance.invalidateSize();
+        return;
+      }
+
+      // Center map on Iran (lat: ~32.4279, lng: ~53.6880, zoom: 5)
+      leafletMapInstance = L.map('leaflet-map').setView([32.4279, 53.6880], 5);
+
+      // OpenStreetMap Tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(leafletMapInstance);
+
+      // Add Province Markers
+      provinceCoordinates.forEach(item => {
+        const marker = L.circleMarker([item.lat, item.lng], {
+          color: '#059669',
+          fillColor: '#10b981',
+          fillOpacity: 0.8,
+          radius: 9
+        }).addTo(leafletMapInstance);
+
+        marker.bindTooltip(`<b>استان ${item.name}</b>`, {
+          permanent: false,
+          direction: 'top',
+          className: 'leaflet-tooltip-custom'
+        });
+
+        marker.on('click', () => {
+          leafletMapInstance.flyTo([item.lat, item.lng], 7, { duration: 1 });
+          handleLeafletProvinceClick(item.name);
+        });
+
+        mainMapMarkers.push(marker);
+      });
+    }
+
+    function resetLeafletMap() {
+      if (leafletMapInstance) {
+        leafletMapInstance.flyTo([32.4279, 53.6880], 5, { duration: 1 });
+      }
+    }
+
+    function handleLeafletProvinceClick(provinceName) {
+      const provData = rawData.find(p => p.province === provinceName);
+      const infoDiv = document.getElementById('map-selected-info');
+
+      if (!provData) return;
+
+      infoDiv.innerHTML = `
+        <div class="space-y-4">
+          <div class="border-b border-slate-200 dark:border-slate-700 pb-3">
+            <div class="flex items-center justify-between mb-1">
+              <h3 class="text-xl font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+                <i class="fa-solid fa-location-dot text-emerald-500"></i> استان ${provData.province}
+              </h3>
+              <span class="text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 font-bold px-2.5 py-1 rounded-full">
+                ${provData.cities.length} شهر
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">مشاهده شده در نقشه Leaflet</p>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">شهرهای ثبت شده این استان:</h4>
+            <div class="flex flex-wrap gap-1.5 max-h-80 overflow-y-auto pr-1">
+              ${provData.cities.map(c => `<span class="text-xs bg-slate-100 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 px-2.5 py-1.5 rounded-lg text-slate-700 dark:text-slate-300 flex items-center gap-1"><i class="fa-solid fa-building text-[10px] text-slate-400"></i> ${c}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- 8. LEAFLET MAP QUIZ IMPLEMENTATION ---
+    function initLeafletQuizMap() {
+      if (leafletQuizMapInstance) {
+        leafletQuizMapInstance.invalidateSize();
+        return;
+      }
+
+      leafletQuizMapInstance = L.map('leaflet-quiz-map').setView([32.4279, 53.6880], 5);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+      }).addTo(leafletQuizMapInstance);
+
+      provinceCoordinates.forEach(item => {
+        const marker = L.circleMarker([item.lat, item.lng], {
+          color: '#2563eb',
+          fillColor: '#3b82f6',
+          fillOpacity: 0.8,
+          radius: 10
+        }).addTo(leafletQuizMapInstance);
+
+        marker.on('click', () => {
+          handleLeafletQuizClick(item.name);
+        });
+
+        quizMapMarkers.push(marker);
+      });
+    }
+
+    function startMapQuiz() {
+      mqScore = 0;
+      mqRemaining = 10;
+      updateMapQuizUI();
+      nextMapQuizQuestion();
+    }
+
+    function updateMapQuizUI() {
+      document.getElementById('mq-score').textContent = mqScore;
+      document.getElementById('mq-remaining').textContent = mqRemaining;
+    }
+
+    function nextMapQuizQuestion() {
+      if (mqRemaining <= 0) {
+        showMapQuizResults();
+        return;
+      }
+
+      const randProv = rawData[Math.floor(Math.random() * rawData.length)].province;
+      mqTargetProvince = randProv;
+      document.getElementById('mq-target-province').textContent = `استان ${randProv}`;
+
+      const feedback = document.getElementById('mq-feedback');
+      feedback.classList.add('hidden');
+    }
+
+    function handleLeafletQuizClick(clickedProvinceName) {
+      if (!mqTargetProvince) return;
+
+      const feedback = document.getElementById('mq-feedback');
+      feedback.classList.remove('hidden');
+
+      if (clickedProvinceName === mqTargetProvince) {
+        mqScore++;
+        feedback.className = "mt-4 p-3 rounded-xl text-center font-bold text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-check ml-1"></i> بسیار عالی! استان ${clickedProvinceName} را روی نقشه Leaflet درست تشخیص دادید.`;
+      } else {
+        feedback.className = "mt-4 p-3 rounded-xl text-center font-bold text-sm bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300";
+        feedback.innerHTML = `<i class="fa-solid fa-circle-xmark ml-1"></i> اشتباه بود! شما روی پین استان ${clickedProvinceName} کلیک کردید.`;
+      }
+
+      mqRemaining--;
+      updateMapQuizUI();
+
+      setTimeout(() => {
+        nextMapQuizQuestion();
+      }, 1300);
+    }
+
+    function showMapQuizResults() {
+      const feedback = document.getElementById('mq-feedback');
+      feedback.classList.remove('hidden');
+      feedback.className = "mt-4 p-4 rounded-xl text-center font-bold text-base bg-emerald-600 text-white shadow-lg";
+      feedback.innerHTML = `چالش به پایان رسید! امتیاز نهایی شما: ${mqScore} از ۱۰ <br> <button onclick="startMapQuiz()" class="mt-3 text-xs bg-white text-emerald-800 px-4 py-2 rounded-xl font-bold hover:bg-slate-100 transition shadow">شروع مجدد آزمون</button>`;
+      mqTargetProvince = null;
+    }
+  </script>
+</body>
+</html>
