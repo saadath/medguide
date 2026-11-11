@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generalized Pruritus — Clinical Workup Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef2f7; --card:#ffffff; --primary:#0e7490; --primary-dark:#155e75;
+    --teal:#14b8a6; --text:#0f172a; --muted:#64748b; --border:#e2e8f0;
+    --soft:#f8fafc;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(1000px 500px at 85% -10%, rgba(20,184,166,.10), transparent 60%),
+      radial-gradient(800px 400px at 0% 110%, rgba(14,116,144,.10), transparent 60%),
+      var(--bg);
+    color:var(--text); min-height:100vh;
+    display:flex; justify-content:center; padding:28px 16px 48px;
+  }
+  .app{width:100%;max-width:900px;display:flex;flex-direction:column;gap:18px}
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--card); border:1px solid var(--border); border-radius:20px;
+    padding:18px 24px; display:flex; align-items:center; gap:16px;
+    box-shadow:0 8px 24px rgba(15,23,42,.05);
+  }
+  .logo{
+    width:46px;height:46px;border-radius:13px;flex:none;
+    background:linear-gradient(135deg,var(--primary),var(--teal));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px rgba(14,116,144,.35);
+  }
+  .logo svg{width:24px;height:24px;stroke:#fff}
+  .head-txt h1{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .head-txt p{font-size:13px;color:var(--muted);margin-top:2px}
+  .head-badge{
+    margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--primary);background:#ecfeff;
+    border:1px solid #a5f3fc;padding:6px 12px;border-radius:999px;white-space:nowrap;
+  }
+  @media(max-width:560px){.head-badge{display:none}}
+
+  /* ---------- Progress ---------- */
+  .progress-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:14px 20px 18px;box-shadow:0 8px 24px rgba(15,23,42,.04);
+  }
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none;display:flex;align-items:center;gap:8px;cursor:pointer;
+    border:1px solid var(--border);background:var(--soft);color:var(--muted);
+    border-radius:999px;padding:6px 14px 6px 8px;font-size:12.5px;font-weight:600;
+    transition:all .25s;user-select:none;
+  }
+  .chip .num{
+    width:22px;height:22px;border-radius:50%;background:#e2e8f0;color:#475569;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+    transition:all .25s;flex:none;
+  }
+  .chip:hover{border-color:#94a3b8;color:#334155}
+  .chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+  .chip.active .num{background:rgba(255,255,255,.25);color:#fff}
+  .chip.done{color:var(--primary-dark);border-color:#99f6e4;background:#f0fdfa}
+  .chip.done .num{background:var(--teal);color:#fff}
+  .bar-track{height:6px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+  .bar-fill{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,var(--primary),var(--teal));
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ---------- Main card & steps ---------- */
+  main{
+    background:var(--card);border:1px solid var(--border);border-radius:24px;
+    padding:clamp(24px,4.5vw,44px);min-height:560px;
+    box-shadow:0 12px 32px rgba(15,23,42,.06);
+    display:flex;flex-direction:column;
+  }
+  .step{display:none;flex:1}
+  .step.active{display:block;animation:rise .45s cubic-bezier(.25,.8,.35,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+  .kicker{
+    font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+  }
+  .kicker::before{content:"";width:22px;height:2px;background:var(--teal);border-radius:2px}
+  h2{font-size:clamp(22px,3.4vw,28px);font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+  .lead{color:var(--muted);font-size:15px;line-height:1.65;max-width:64ch}
+
+  /* ---------- Notes / callouts ---------- */
+  .note{
+    display:flex;gap:12px;align-items:flex-start;margin-top:20px;
+    background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;
+    padding:14px 16px;border-radius:12px;font-size:14px;line-height:1.6;
+  }
+  .note.clinical{background:#eff6ff;border-color:#bfdbfe;border-left-color:#3b82f6}
+  .note.danger{background:#fef2f2;border-color:#fecaca;border-left-color:#ef4444}
+  .note svg{width:20px;height:20px;flex:none;margin-top:1px}
+  .note b{font-weight:700}
+
+  /* ---------- Tables ---------- */
+  .table-wrap{
+    border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:22px;
+    overflow-x:auto;background:#fff;
+  }
+  table{width:100%;border-collapse:collapse;min-width:560px}
+  thead th{
+    background:var(--soft);text-align:left;font-size:11px;font-weight:800;
+    text-transform:uppercase;letter-spacing:.09em;color:#475569;
+    padding:12px 18px;border-bottom:1px solid var(--border);
+  }
+  tbody td{padding:13px 18px;border-bottom:1px solid var(--border);vertical-align:top;font-size:14px;line-height:1.55}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:#f0fdfa}
+  .test-name{font-weight:700;white-space:nowrap}
+  .cat{
+    display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;
+    padding:2px 9px;border-radius:999px;letter-spacing:.03em;
+  }
+  .c-hemat{background:#ffe4e6;color:#be123c}
+  .c-inflam{background:#ffedd5;color:#c2410c}
+  .c-endo{background:#fef3c7;color:#b45309}
+  .c-renal{background:#e0f2fe;color:#0369a1}
+  .c-hepatic{background:#ede9fe;color:#6d28d9}
+  .c-immune{background:#dcfce7;color:#15803d}
+  .c-general{background:#f1f5f9;color:#475569}
+  .c-mast{background:#fce7f3;color:#be185d}
+
+  /* ---------- Overview ---------- */
+  .objectives{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+  @media(max-width:600px){.objectives{grid-template-columns:1fr}}
+  .obj{
+    border:1px solid var(--border);border-radius:16px;padding:18px;
+    background:linear-gradient(180deg,#fff, var(--soft));transition:all .25s;
+  }
+  .obj:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(14,116,144,.10);border-color:#99f6e4}
+  .obj .n{
+    font-size:12px;font-weight:800;color:var(--teal);letter-spacing:.1em;margin-bottom:8px;
+  }
+  .obj h3{font-size:15px;font-weight:700;margin-bottom:6px}
+  .obj p{font-size:13.5px;color:var(--muted);line-height:1.6}
+  .hint{
+    margin-top:22px;display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);
+    background:var(--soft);border:1px dashed #cbd5e1;border-radius:12px;padding:12px 16px;
+  }
+  .hint svg{width:18px;height:18px;flex:none;color:var(--primary)}
+
+  /* ---------- Advanced grid ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:22px}
+  .g-item{
+    border:1px solid var(--border);border-radius:14px;padding:14px 16px;background:#fff;
+    transition:all .2s;
+  }
+  .g-item:hover{border-color:var(--teal);background:#f0fdfa;transform:translateY(-2px)}
+  .g-item .t{font-weight:700;font-size:14px;margin-bottom:4px}
+  .g-item .d{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+  /* ---------- Algorithm ---------- */
+  .node{
+    width:fit-content;margin:26px auto 0;background:var(--primary);color:#fff;
+    font-weight:700;font-size:14px;padding:11px 22px;border-radius:999px;
+    box-shadow:0 6px 16px rgba(14,116,144,.3);
+  }
+  .arrow-down{display:flex;justify-content:center;color:#94a3b8;margin:6px 0 14px}
+  .arrow-down svg{width:22px;height:22px;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+  .branches{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.branches{grid-template-columns:1fr}}
+  .branch-btn{
+    cursor:pointer;border:2px solid var(--border);background:var(--soft);
+    border-radius:16px;padding:16px;text-align:left;transition:all .25s;
+    display:flex;gap:12px;align-items:center;font-family:inherit;width:100%;
+  }
+  .branch-btn:hover{border-color:#94a3b8}
+  .branch-btn.active{border-color:var(--primary);background:#ecfeff;box-shadow:0 6px 16px rgba(14,116,144,.12)}
+  .branch-btn .ic{
+    width:40px;height:40px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:16px;
+  }
+  .b-yes .ic{background:#dcfce7;color:#15803d}
+  .b-no .ic{background:#fee2e2;color:#b91c1c}
+  .branch-btn.active.b-yes .ic{background:#15803d;color:#fff}
+  .branch-btn.active.b-no .ic{background:#b91c1c;color:#fff}
+  .branch-btn h4{font-size:14px;font-weight:700}
+  .branch-btn p{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .branch-panel{display:none;margin-top:18px}
+  .branch-panel.show{display:block;animation:rise .35s ease}
+  .flow-card{
+    border:1px solid var(--border);border-radius:16px;padding:18px;background:var(--soft);
+  }
+  .flow-item{
+    display:flex;gap:12px;align-items:flex-start;padding:11px 4px;
+    border-bottom:1px dashed var(--border);
+  }
+  .flow-item:last-child{border-bottom:none}
+  .flow-item .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--teal);flex:none;margin-top:6px;
+    box-shadow:0 0 0 3px #ccfbf1;
+  }
+  .flow-item b{font-size:14px}
+  .flow-item span{font-size:13px;color:var(--muted);line-height:1.55;display:block;margin-top:2px}
+  .lab-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+  .lab-chips code{
+    font-family:'Inter';font-size:12px;font-weight:600;background:#fff;
+    border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--primary-dark);
+  }
+  .next-arrow{
+    display:flex;align-items:center;gap:10px;margin:14px 0 4px;color:var(--primary);
+    font-weight:700;font-size:13px;
+  }
+  .next-arrow svg{width:20px;height:20px}
+
+  /* ---------- Summary ---------- */
+  .check-list{margin-top:22px;display:flex;flex-direction:column;gap:10px}
+  .check-item{
+    display:flex;gap:14px;align-items:flex-start;cursor:pointer;user-select:none;
+    border:1px solid var(--border);border-radius:14px;padding:14px 16px;
+    background:var(--soft);transition:all .2s;
+  }
+  .check-item:hover{border-color:#99f6e4}
+  .check-item .box{
+    width:24px;height:24px;border-radius:8px;border:2px solid #cbd5e1;flex:none;
+    display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px;
+  }
+  .check-item .box svg{width:14px;height:14px;stroke:#fff;opacity:0;transform:scale(.5);transition:all .2s}
+  .check-item.done{background:#f0fdfa;border-color:#99f6e4}
+  .check-item.done .box{background:var(--teal);border-color:var(--teal)}
+  .check-item.done .box svg{opacity:1;transform:scale(1)}
+  .check-item.done .ct{color:#334155}
+  .check-item .ct b{font-size:14px}
+  .check-item .ct p{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.55}
+  .restart-zone{margin-top:26px;display:flex;justify-content:center}
+
+  /* ---------- Footer nav ---------- */
+  nav{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:14px 18px;box-shadow:0 8px 24px rgba(15,23,42,.04);
+  }
+  .step-count{font-size:13px;font-weight:600;color:var(--muted)}
+  .btns{display:flex;gap:10px;margin-left:auto}
+  button.nav-btn{
+    font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+    display:flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;
+    transition:all .2s;border:1px solid transparent;
+  }
+  button.nav-btn svg{width:17px;height:17px}
+  .btn-ghost{background:var(--soft);border-color:var(--border)!important;color:#334155}
+  .btn-ghost:hover:not(:disabled){background:#e2e8f0;transform:translateX(-2px)}
+  .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 5px 14px rgba(14,116,144,.3)}
+  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 18px rgba(14,116,144,.4)}
+  .btn-primary:active,.btn-ghost:active{transform:scale(.97)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .footer-note{text-align:center;font-size:12px;color:#94a3b8;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </div>
+    <div class="head-txt">
+      <h1>Generalized Pruritus</h1>
+      <p>Structured clinical workup — from first-line labs to a full diagnostic algorithm</p>
+    </div>
+    <div class="head-badge">Clinical Guide</div>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-card">
+    <div class="chips" id="chips"></div>
+    <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+  </div>
+
+  <!-- Main -->
+  <main>
+
+    <!-- STEP 0 : Overview -->
+    <section class="step active" data-label="Overview">
+      <div class="kicker">Introduction</div>
+      <h2>Approach to Generalized Pruritus</h2>
+      <p class="lead">A step-by-step, wizard-style guide for evaluating the patient presenting with generalized itch — moving logically from history and skin examination to laboratory investigation.</p>
+
+      <div class="objectives">
+        <div class="obj">
+          <div class="n">GOAL 01</div>
+          <h3>Evaluate Allergic & Skin Causes</h3>
+          <p>Assess for primary dermatologic disease and investigate allergic etiologies when the history supports them.</p>
+        </div>
+        <div class="obj">
+          <div class="n">GOAL 02</div>
+          <h3>Exclude Systemic Causes</h3>
+          <p>Systematically rule out systemic, metabolic, hematologic, and infectious etiologies of generalized pruritus.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5v.01"/></svg>
+        <div><b>Key concept:</b> Generalized pruritus is <b>not necessarily allergic</b> in origin. When no primary skin lesion is present — <b>Pruritus sine materia</b> — systemic causes must be taken far more seriously.</div>
+      </div>
+
+      <div class="hint">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Navigate through 4 clinical steps using the <b>Next</b> button or arrow keys — you can jump to any step from the progress bar above.
+      </div>
+    </section>
+
+    <!-- STEP 1 : Initial Labs -->
+    <section class="step" data-label="Initial Labs">
+      <div class="kicker">Step 1 — First-Line Workup</div>
+      <h2>Initial Laboratory Panel</h2>
+      <p class="lead">Recommended baseline tests for any patient presenting with generalized pruritus of unknown cause.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:38%">Test</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td><span class="test-name">CBC + Diff</span><br><span class="cat c-hemat">Hematology</span></td><td>Eosinophilia, polycythemia, lymphoma, and other hematologic disorders</td></tr>
+            <tr><td><span class="test-name">ESR, CRP</span><br><span class="cat c-inflam">Inflammation</span></td><td>Inflammation and underlying systemic disease</td></tr>
+            <tr><td><span class="test-name">FBS, HbA1c</span><br><span class="cat c-endo">Endocrine</span></td><td>Diabetes mellitus</td></tr>
+            <tr><td><span class="test-name">BUN, Creatinine, eGFR</span><br><span class="cat c-renal">Renal</span></td><td>Kidney disease and uremia</td></tr>
+            <tr><td><span class="test-name">AST, ALT, ALP, GGT</span><br><span class="cat c-hepatic">Hepatic</span></td><td>Liver disease and cholestasis</td></tr>
+            <tr><td><span class="test-name">Total &amp; Direct Bilirubin</span><br><span class="cat c-hepatic">Biliary</span></td><td>Biliary and cholestatic disorders</td></tr>
+            <tr><td><span class="test-name">TSH</span><br><span class="cat c-endo">Endocrine</span></td><td>Thyroid dysfunction</td></tr>
+            <tr><td><span class="test-name">Ferritin, Serum Iron, TIBC</span><br><span class="cat c-hemat">Iron Studies</span></td><td>Iron deficiency</td></tr>
+            <tr><td><span class="test-name">Calcium, Phosphorus</span><br><span class="cat c-endo">Metabolic</span></td><td>Metabolic disturbances</td></tr>
+            <tr><td><span class="test-name">Urinalysis</span><br><span class="cat c-renal">Renal</span></td><td>Kidney disease and other urinary disorders</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note clinical">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <div>In pruritus <b>without primary skin lesions</b>, <b>ALP and GGT deserve special attention</b> — cholestasis may present with itch <b>before jaundice appears</b>.</div>
+      </div>
+    </section>
+
+    <!-- STEP 2 : Allergy -->
+    <section class="step" data-label="Allergy Workup">
+      <div class="kicker">Step 2 — Targeted Testing</div>
+      <h2>Allergic Workup</h2>
+      <p class="lead">If the history points toward allergy, order tests <b>in a targeted way</b> — guided by the clinical picture, not as a blanket panel.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:38%">Test</th><th>Indication</th></tr></thead>
+          <tbody>
+            <tr><td><span class="test-name">Total IgE</span><br><span class="cat c-immune">Screening</span></td><td>When atopic disease is suspected — <b>not</b> a specific screening test</td></tr>
+            <tr><td><span class="test-name">Specific IgE</span><br><span class="cat c-immune">Allergen-Specific</span></td><td>Sensitivity to a defined allergen — foods, dust, mites, pollen, animals</td></tr>
+            <tr><td><span class="test-name">Skin Prick Test</span><br><span class="cat c-immune">In-Vivo · Immediate</span></td><td>Immediate (IgE-mediated) allergy</td></tr>
+            <tr><td><span class="test-name">Patch Test</span><br><span class="cat c-immune">In-Vivo · Delayed</span></td><td>Allergic contact dermatitis</td></tr>
+            <tr><td><span class="test-name">Serum Tryptase</span><br><span class="cat c-mast">Mast Cell</span></td><td>Suspected mastocytosis or recurrent anaphylactic reactions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5v.01"/></svg>
+        <div>Requesting a broad <b>Food Allergy panel</b> — or <b>Total IgE alone</b> — is <b>not recommended</b> for identifying the cause of generalized pruritus.</div>
+      </div>
+      <div class="note clinical">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16.5v.01"/></svg>
+        <div>A positive <b>Specific IgE</b> does <b>not</b> necessarily indicate clinical allergy — results must always be interpreted alongside the history.</div>
+      </div>
+    </section>
+
+    <!-- STEP 3 : Advanced -->
+    <section class="step" data-label="Advanced Tests">
+      <div class="kicker">Step 3 — Second-Line Workup</div>
+      <h2>Advanced Investigations</h2>
+      <p class="lead">Indicated when initial labs are normal but pruritus persists — or when suspicious findings emerge.</p>
+
+      <div class="grid">
+        <div class="g-item"><div class="t">LDH + Peripheral Blood Smear</div><div class="d">Hematologic malignancy screening — lymphoma, blood dyscrasias</div></div>
+        <div class="g-item"><div class="t">SPEP + Immunofixation</div><div class="d">Monoclonal gammopathies and plasma cell disorders</div></div>
+        <div class="g-item"><div class="t">HBsAg + Anti-HCV</div><div class="d">Viral hepatitis B and C</div></div>
+        <div class="g-item"><div class="t">HIV Ab/Ag</div><div class="d">Based on individual risk assessment</div></div>
+        <div class="g-item"><div class="t">Calcium, Phosphorus, PTH</div><div class="d">Parathyroid and mineral metabolic disorders</div></div>
+        <div class="g-item"><div class="t">AMA</div><div class="d">If Primary Biliary Cholangitis (PBC) is suspected</div></div>
+        <div class="g-item"><div class="t">ANA + Autoimmune Panel</div><div class="d">Other autoimmune tests, guided by accompanying symptoms</div></div>
+        <div class="g-item"><div class="t">Stool Ova &amp; Parasites</div><div class="d">When there is clinical suspicion of parasitic infection</div></div>
+      </div>
+
+      <div class="note danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <div><b>Red flags:</b> In chronic unexplained pruritus — especially with <b>weight loss, night sweats, fever, or lymphadenopathy</b> — proceed to hematologic workup and imaging such as <b>CXR</b> and <b>abdominal ultrasound</b>.</div>
+      </div>
+    </section>
+
+    <!-- STEP 4 : Algorithm -->
+    <section class="step" data-label="Algorithm">
+      <div class="kicker">Step 4 — Diagnostic Algorithm</div>
+      <h2>Proposed Algorithm</h2>
+      <p class="lead">Always begin with a careful skin examination, then follow the appropriate branch.</p>
+
+      <div class="node">Start · Skin Examination</div>
+      <div class="arrow-down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+
+      <div class="branches">
+        <button class="branch-btn b-yes active" data-branch="yes">
+          <div class="ic">✓</div>
+          <div><h4>Primary skin lesion present</h4><p>Follow the dermatologic pathway</p></div>
+        </button>
+        <button class="branch-btn b-no" data-branch="no">
+          <div class="ic">✕</div>
+          <div><h4>No primary skin lesion</h4><p>Pruritus sine materia → systemic pathway</p></div>
+        </button>
+      </div>
+
+      <div class="branch-panel show" id="panel-yes">
+        <div class="flow-card">
+          <div class="flow-item"><div class="dot"></div><div><b>Urticaria</b><span>Allergy workup guided by the clinical history</span></div></div>
+          <div class="flow-item"><div class="dot"></div><div><b>Eczema</b><span>Evaluate for atopic dermatitis or contact dermatitis</span></div></div>
+          <div class="flow-item"><div class="dot"></div><div><b>Burrows / nocturnal itching</b><span>Consider and work up scabies</span></div></div>
+          <div class="flow-item"><div class="dot"></div><div><b>Unusual lesions</b><span>Dermatology referral — skin biopsy may be indicated</span></div></div>
+        </div>
+      </div>
+
+      <div class="branch-panel" id="panel-no">
+        <div class="flow-card">
+          <div class="flow-item"><div class="dot"></div>
+            <div><b>Order the initial panel</b>
+              <div class="lab-chips"><code>CBC</code><code>ESR</code><code>CRP</code><code>Ferritin</code><code>LFT</code><code>RFT</code><code>TSH</code><code>FBS / HbA1c</code><code>LDH</code></div>
+            </div>
+          </div>
+          <div class="next-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Initial workup normal but pruritus persists?</div>
+          <div class="flow-item"><div class="dot"></div>
+            <div><b>Advanced workup</b><span>Guided by history, examination, age, and risk factors — including hepatic, hematologic, and infectious disease, and malignancy screening.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5 : Summary -->
+    <section class="step" data-label="Summary">
+      <div class="kicker">Wrap-Up</div>
+      <h2>Key Takeaways</h2>
+      <p class="lead">Review the essential points of the workup. Click each item to check it off.</p>
+
+      <div class="check-list">
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>Pruritus sine materia → think systemic first</b><p>Generalized itch without primary skin lesions is not necessarily allergic — systemic causes must be investigated seriously.</p></div>
+        </div>
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>Complete the initial panel before advancing</b><p>CBC, ESR/CRP, glucose, renal, hepatic/biliary, thyroid, iron studies, calcium/phosphorus, and urinalysis.</p></div>
+        </div>
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>Allergy testing only when history supports it</b><p>Broad food panels and Total IgE alone are not recommended; order targeted tests.</p></div>
+        </div>
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>Positive Specific IgE ≠ clinical allergy</b><p>Sensitization must be correlated with the clinical picture.</p></div>
+        </div>
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>ALP &amp; GGT are pivotal without skin lesions</b><p>Cholestasis can present with pruritus before jaundice appears.</p></div>
+        </div>
+        <div class="check-item">
+          <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round"><path d="M4 12l5 5L20 7"/></svg></div>
+          <div class="ct"><b>Never ignore red flags</b><p>Weight loss, night sweats, fever, or lymphadenopathy → hematologic workup + CXR and abdominal ultrasound.</p></div>
+        </div>
+      </div>
+
+      <div class="restart-zone">
+        <button class="nav-btn btn-ghost" id="restartBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          Start Over
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Nav -->
+  <nav>
+    <div class="step-count" id="stepCount">Step 1 of 6</div>
+    <div class="btns">
+      <button class="nav-btn btn-ghost" id="prevBtn" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <button class="nav-btn btn-primary" id="nextBtn">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </nav>
+  <div class="footer-note">Educational summary — always correlate with full clinical judgment.</div>
+</div>
+
+<script>
+(function(){
+  const steps = [...document.querySelectorAll('.step')];
+  const chipsBox = document.getElementById('chips');
+  const barFill = document.getElementById('barFill');
+  const stepCount = document.getElementById('stepCount');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const total = steps.length;
+  let current = 0;
+
+  // Build chips
+  steps.forEach((s, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span class="num">${i+1}</span><span class="lbl">${s.dataset.label}</span>`;
+    chip.addEventListener('click', () => go(i));
+    chipsBox.appendChild(chip);
+  });
+  const chips = [...chipsBox.children];
+
+  function go(i){
+    current = Math.max(0, Math.min(total-1, i));
+    steps.forEach((s, idx) => s.classList.toggle('active', idx === current));
+    chips.forEach((c, idx) => {
+      c.classList.toggle('active', idx === current);
+      c.classList.toggle('done', idx < current);
+    });
+    barFill.style.width = (current/(total-1))*100 + '%';
+    stepCount.textContent = `Step ${current+1} of ${total}`;
+    prevBtn.disabled = current === 0;
+    if(current === total-1){
+      nextBtn.innerHTML = 'Restart <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
+    } else {
+      nextBtn.innerHTML = 'Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  nextBtn.addEventListener('click', () => {
+    if(current === total-1){
+      document.querySelectorAll('.check-item').forEach(c => c.classList.remove('done'));
+      go(0);
+    } else go(current+1);
+  });
+  prevBtn.addEventListener('click', () => go(current-1));
+  restartBtn.addEventListener('click', () => {
+    document.querySelectorAll('.check-item').forEach(c => c.classList.remove('done'));
+    go(0);
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if(e.key === 'ArrowRight') go(current+1);
+    if(e.key === 'ArrowLeft') go(current-1);
+  });
+
+  // Algorithm branch toggle
+  document.querySelectorAll('.branch-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.branch-panel').forEach(p => p.classList.remove('show'));
+      document.getElementById('panel-' + btn.dataset.branch).classList.add('show');
+    });
+  });
+
+  // Summary checklist
+  document.querySelectorAll('.check-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('done'));
+  });
+
+  go(0);
+})();
+</script>
+</body>
+</html>
