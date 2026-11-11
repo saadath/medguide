@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویرایشگر حرفه‌ای و مدرن</title>
+    <!-- اضافه کردن فونت وزیرمتن -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- اضافه کردن آیکون‌های FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* متغیرهای تم روشن */
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --primary-color: #5a67d8;
+            --toolbar-bg: #ffffff;
+            --btn-hover: #f3f4f6;
+            --btn-active: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            /* متغیرهای تم تاریک */
+            --bg-color: #111827;
+            --surface-color: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --primary-color: #7f9cf5;
+            --toolbar-bg: #1f2937;
+            --btn-hover: #374151;
+            --btn-active: #4b5563;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* هدر اصلی */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary-color);
+        }
+
+        .logo-icon {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+        }
+
+        .theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .theme-toggle:hover {
+            background: var(--btn-hover);
+        }
+
+        /* ساختار ویرایشگر */
+        .editor-wrapper {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* منوی متنی بالا */
+        .menu-bar {
+            display: flex;
+            gap: 25px;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .menu-item {
+            cursor: pointer;
+            transition: color 0.2s;
+            position: relative;
+            user-select: none;
+        }
+
+        .menu-item:hover {
+            color: var(--primary-color);
+        }
+
+        /* منوهای کشویی بالا */
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            list-style: none;
+            padding: 5px 0;
+            min-width: 180px;
+            display: none;
+            z-index: 100;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu li {
+            padding: 8px 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .dropdown-menu li:hover {
+            background: var(--btn-hover);
+            color: var(--primary-color);
+        }
+
+        /* نوار ابزار */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: var(--toolbar-bg);
+            border-bottom: 1px solid var(--border-color);
+            gap: 5px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding-left: 15px;
+            margin-left: 15px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .toolbar-group:last-child {
+            border-left: none;
+        }
+
+        /* استایل منوهای کشویی ابزار */
+        .tool-select {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            height: 36px;
+            border-radius: 8px;
+            padding: 0 10px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .tool-select:hover {
+            background: var(--btn-hover);
+        }
+
+        .tool-select option {
+            background: var(--surface-color);
+            color: var(--text-main);
+        }
+
+        /* دکمه‌ها */
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            min-width: 36px;
+            padding: 0 8px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: var(--btn-hover);
+            color: var(--primary-color);
+        }
+
+        .tool-btn.active {
+            background: var(--btn-active);
+            color: var(--primary-color);
+        }
+
+        /* استایل انتخاب‌گر رنگ */
+        .tool-color {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 2px;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .tool-color:hover {
+            background: var(--btn-hover);
+        }
+
+        .tool-color::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .tool-color::-webkit-color-swatch {
+            border: none;
+            border-radius: 4px;
+        }
+        
+        .tool-color::-moz-color-swatch {
+            border: none;
+            border-radius: 4px;
+        }
+
+        /* ناحیه ویرایش متن */
+        .editor-content {
+            padding: 30px;
+            min-height: 400px;
+            outline: none;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            overflow-y: auto;
+        }
+        
+        .editor-content p {
+            margin-bottom: 1em;
+        }
+
+        /* حالت نمایش کد در خود ادیتور */
+        .editor-content.code-view {
+            font-family: monospace !important;
+            direction: ltr !important;
+            text-align: left !important;
+            white-space: pre-wrap;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* استایل‌های جدول داخل ویرایشگر */
+        .editor-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+        
+        .editor-content th, 
+        .editor-content td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            min-width: 50px;
+        }
+
+        /* استایل پاپ آپ (Modal) درباره ما */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-box h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+
+        .modal-box p {
+            margin-bottom: 10px;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .modal-close-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* استایل‌های پیام کپی */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        
+        <!-- هدر -->
+        <header class="top-header">
+            <div class="logo-section">
+                <div class="logo-icon"><i class="fa-solid fa-pen-nib"></i></div>
+                ویرایشگر سودیان
+            </div>
+            <button class="theme-toggle" id="themeBtn" title="تغییر تم">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </header>
+
+        <!-- کانتینر ویرایشگر -->
+        <div class="editor-wrapper">
+            
+            <!-- منوی متنی بالا -->
+            <div class="menu-bar">
+                <div class="menu-item" onclick="toggleMenu(event, 'fileMenu')">
+                    فایل
+                    <ul class="dropdown-menu" id="fileMenu">
+                        <li onclick="saveFile()"><i class="fa-solid fa-download"></i> ذخیره فایل (HTML)</li>
+                    </ul>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu(event, 'tableMenu')">
+                    جدول
+                    <ul class="dropdown-menu" id="tableMenu">
+                        <li onclick="insertTable()"><i class="fa-solid fa-table"></i> درج جدول جدید</li>
+                    </ul>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu(event, 'colorMenu')">
+                    رنگ
+                    <ul class="dropdown-menu" id="colorMenu" style="padding: 10px; text-align: center;">
+                        <li>انتخاب رنگ متن:</li>
+                        <li><input type="color" class="tool-color" onchange="execCmd('foreColor', this.value)" title="رنگ متن" value="#1f2937" style="width: 100%;"></li>
+                    </ul>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu(event, 'fontSizeMenu')">
+                    اندازه فونت
+                    <ul class="dropdown-menu" id="fontSizeMenu">
+                        <li onclick="setFontSize('10px')">۱۰ پیکسل</li>
+                        <li onclick="setFontSize('12px')">۱۲ پیکسل</li>
+                        <li onclick="setFontSize('14px')">۱۴ پیکسل</li>
+                        <li onclick="setFontSize('16px')">۱۶ پیکسل (عادی)</li>
+                        <li onclick="setFontSize('18px')">۱۸ پیکسل</li>
+                        <li onclick="setFontSize('20px')">۲۰ پیکسل</li>
+                        <li onclick="setFontSize('24px')">۲۴ پیکسل</li>
+                        <li onclick="setFontSize('28px')">۲۸ پیکسل</li>
+                        <li onclick="setFontSize('32px')">۳۲ پیکسل</li>
+                        <li onclick="setFontSize('36px')">۳۶ پیکسل</li>
+                    </ul>
+                </div>
+
+                <div class="menu-item" onclick="toggleMenu(event, 'headingMenu')">
+                    هدینگ ها
+                    <ul class="dropdown-menu" id="headingMenu">
+                        <li onclick="formatHeading('p')">پاراگراف (عادی)</li>
+                        <li onclick="formatHeading('h1')">تیتر ۱ (H1)</li>
+                        <li onclick="formatHeading('h2')">تیتر ۲ (H2)</li>
+                        <li onclick="formatHeading('h3')">تیتر ۳ (H3)</li>
+                        <li onclick="formatHeading('h4')">تیتر ۴ (H4)</li>
+                        <li onclick="formatHeading('h5')">تیتر ۵ (H5)</li>
+                        <li onclick="formatHeading('h6')">تیتر ۶ (H6)</li>
+                    </ul>
+                </div>
+
+                <div class="menu-item" onclick="openAboutModal()">
+                    درباره ما
+                </div>
+            </div>
+
+            <!-- نوار ابزار -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="execCmd('undo')" title="بازگردانی (Undo)"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="tool-btn" onclick="execCmd('redo')" title="انجام مجدد (Redo)"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+
+                <div class="toolbar-group">
+                    <select class="tool-select" onchange="formatHeading(this.value)" title="عنوان‌بندی (Heading)">
+                        <option value="p">پاراگراف (عادی)</option>
+                        <option value="h1">تیتر ۱ (H1)</option>
+                        <option value="h2">تیتر ۲ (H2)</option>
+                        <option value="h3">تیتر ۳ (H3)</option>
+                        <option value="h4">تیتر ۴ (H4)</option>
+                        <option value="h5">تیتر ۵ (H5)</option>
+                        <option value="h6">تیتر ۶ (H6)</option>
+                    </select>
+
+                    <select class="tool-select" onchange="setFontSize(this.value)" title="اندازه فونت">
+                        <option value="" disabled selected>سایز متن</option>
+                        <option value="10px">۱۰ پیکسل</option>
+                        <option value="12px">۱۲ پیکسل</option>
+                        <option value="14px">۱۴ پیکسل</option>
+                        <option value="16px" selected>۱۶ پیکسل</option>
+                        <option value="18px">۱۸ پیکسل</option>
+                        <option value="20px">۲۰ پیکسل</option>
+                        <option value="24px">۲۴ پیکسل</option>
+                        <option value="28px">۲۸ پیکسل</option>
+                        <option value="32px">۳۲ پیکسل</option>
+                        <option value="36px">۳۶ پیکسل</option>
+                    </select>
+                </div>
+
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="execCmd('bold')" title="ضخیم (Bold)"><i class="fa-solid fa-bold"></i></button>
+                    <button class="tool-btn" onclick="execCmd('italic')" title="مورب (Italic)"><i class="fa-solid fa-italic"></i></button>
+                    <button class="tool-btn" onclick="execCmd('underline')" title="زیرخط (Underline)"><i class="fa-solid fa-underline"></i></button>
+                    
+                    <input type="color" class="tool-color" onchange="execCmd('foreColor', this.value)" title="رنگ متن" value="#1f2937">
+                </div>
+
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="execCmd('justifyRight')" title="راست‌چین"><i class="fa-solid fa-align-right"></i></button>
+                    <button class="tool-btn" onclick="execCmd('justifyCenter')" title="وسط‌چین"><i class="fa-solid fa-align-center"></i></button>
+                    <button class="tool-btn" onclick="execCmd('justifyLeft')" title="چپ‌چین"><i class="fa-solid fa-align-left"></i></button>
+                    <button class="tool-btn" onclick="execCmd('justifyFull')" title="تراز کامل"><i class="fa-solid fa-align-justify"></i></button>
+                </div>
+
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="setDirection('rtl')" title="راست به چپ (RTL)"><i class="fa-solid fa-right-left"></i> RTL</button>
+                    <button class="tool-btn" onclick="setDirection('ltr')" title="چپ به راست (LTR)"><i class="fa-solid fa-left-right"></i> LTR</button>
+                </div>
+
+                <div class="toolbar-group">
+                    <button class="tool-btn" onclick="insertTable()" title="درج جدول"><i class="fa-solid fa-table"></i></button>
+                    
+                    <!-- ابزار نمایش و ویرایش کدهای HTML -->
+                    <button class="tool-btn" id="codeToggleBtn" onclick="toggleHtmlSourceView()" title="نمایش/ویرایش کدهای HTML" style="color: var(--primary-color);">
+                        <i class="fa-solid fa-code"></i>
+                    </button>
+                    
+                    <!-- ابزار کپی کردن همه کدهای HTML -->
+                    <button class="tool-btn" onclick="copyHtmlCodes()" title="کپی کردن همه کدهای HTML" style="color: var(--primary-color);">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+
+                    <button class="tool-btn" onclick="copyContent()" title="کپی متن ساده در کلیپ‌بورد">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ناحیه متنی -->
+            <div class="editor-content" id="editor" contenteditable="true" dir="rtl">
+                <p>به ویرایشگر مدرن خوش آمدید!</p>
+                <p>این یک ویرایشگر اختصاصی با <b>تم روشن و تاریک</b> است که از فونت زیبای وزیرمتن استفاده می‌کند.</p>
+                <p>شما می‌توانید متن خود را در اینجا بنویسید، سایز و رنگ آن را تغییر دهید، تراز‌بندی کنید و جهت متن را (RTL یا LTR) فقط برای خطوط مورد نظر به راحتی تنظیم نمایید.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- پاپ آپ (Modal) درباره ما -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-box">
+            <h3>درباره ما</h3>
+            <p>طراحی توسط گروه نرم افزاری سوفیا</p>
+            <p>ایمیل : drhsaadat@gmail.com</p>
+            <button class="modal-close-btn" onclick="closeAboutModal()">بستن</button>
+        </div>
+    </div>
+
+    <!-- پیغام کپی موفق -->
+    <div class="toast" id="copyToast"><i class="fa-solid fa-check"></i> عملیات با موفقیت انجام شد!</div>
+
+    <script>
+        document.execCommand('defaultParagraphSeparator', false, 'p');
+
+        let isCodeView = false;
+
+        // --- تابع فرمت‌بندی (Indent کردن) کدهای HTML ---
+        function formatHtmlCode(html) {
+            let formatted = '';
+            let indent = '';
+            // شکستن تگ‌ها برای قالب‌بندی خط به خط
+            html.split(/>\s*</).forEach(node => {
+                if (node.match(/^\/\w/)) {
+                    indent = indent.substring(4);
+                }
+                formatted += indent + '<' + node + '>\r\n';
+                if (node.match(/^<?\w[^>]*[^\/]$/) && !node.startsWith('input') && !node.startsWith('br') && !node.startsWith('hr') && !node.startsWith('img')) {
+                    indent += '    ';
+                }
+            });
+            // پاکسازی خطوط اضافه احتمالی
+            return formatted.substring(1, formatted.length - 3).trim();
+        }
+
+        // --- باز و بسته کردن منوهای بالا ---
+        function toggleMenu(event, menuId) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== menuId) menu.classList.remove('show');
+            });
+            const menu = document.getElementById(menuId);
+            menu.classList.toggle('show');
+        }
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
+
+        // --- مدیریت پاپ آپ درباره ما ---
+        function openAboutModal() {
+            document.getElementById('aboutModal').classList.add('show');
+        }
+
+        function closeAboutModal() {
+            document.getElementById('aboutModal').classList.remove('show');
+        }
+
+        // --- سوئیچ بین حالت نمایش بصری و حالت کد با قابلیت فرمت‌بندی خودکار ---
+        function toggleHtmlSourceView() {
+            const editor = document.getElementById('editor');
+            const codeBtn = document.getElementById('codeToggleBtn');
+
+            if (!isCodeView) {
+                // رفتن به حالت کد و فرمت کردن آن
+                const htmlContent = editor.innerHTML;
+                editor.innerText = formatHtmlCode(htmlContent);
+                editor.classList.add('code-view');
+                editor.setAttribute('contenteditable', 'true');
+                codeBtn.classList.add('active');
+                isCodeView = true;
+            } else {
+                // برگشت به حالت بصری (رندر شده)
+                const codeContent = editor.innerText;
+                editor.innerHTML = codeContent;
+                editor.classList.remove('code-view');
+                codeBtn.classList.remove('active');
+                isCodeView = false;
+            }
+            editor.focus();
+        }
+
+        // --- کپی کردن همه کدهای HTML ---
+        function copyHtmlCodes() {
+            const editor = document.getElementById('editor');
+            let htmlContent = isCodeView ? editor.innerText : editor.innerHTML;
+
+            navigator.clipboard.writeText(htmlContent).then(() => {
+                showToast('همه کدهای HTML در کلیپ‌بورد کپی شد!');
+            }).catch(err => {
+                console.error('خطا در کپی: ', err);
+                alert('مرورگر شما از قابلیت کپی پشتیبانی نمی‌کند.');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('copyToast');
+            toast.innerHTML = `<i class="fa-solid fa-check"></i> ${message}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function saveFile() {
+            const editor = document.getElementById('editor');
+            const editorContent = isCodeView ? editor.innerText : editor.innerHTML;
+            
+            const fullHTML = `<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>خروجی ویرایشگر</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; padding: 20px; line-height: 1.8; color: #1f2937; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; min-width: 50px; }
+    </style>
+</head>
+<body>
+    ${editorContent}
+</body>
+</html>`;
+
+            const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'document.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function execCmd(command, value = null) {
+            if (isCodeView) return;
+            document.execCommand(command, false, value);
+            document.getElementById('editor').focus();
+        }
+
+        function formatHeading(tag) {
+            if (isCodeView) return;
+            document.execCommand('formatBlock', false, tag);
+            document.getElementById('editor').focus();
+        }
+
+        function setFontSize(size) {
+            if (isCodeView) return;
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            
+            const range = selection.getRangeAt(0);
+            if (range.collapsed) return;
+
+            const span = document.createElement('span');
+            span.style.fontSize = size;
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+            
+            document.getElementById('editor').focus();
+        }
+
+        function insertTable() {
+            if (isCodeView) return;
+            const rows = prompt('تعداد سطرها را وارد کنید:', '3');
+            if (!rows || isNaN(rows)) return;
+            
+            const cols = prompt('تعداد ستون‌ها را وارد کنید:', '3');
+            if (!cols || isNaN(cols)) return;
+            
+            let tableHTML = '<table><tbody>';
+            for (let i = 0; i < rows; i++) {
+                tableHTML += '<tr>';
+                for (let j = 0; j < cols; j++) {
+                    tableHTML += '<td><br></td>';
+                }
+                tableHTML += '</tr>';
+            }
+            tableHTML += '</tbody></table><p><br></p>';
+            
+            document.execCommand('insertHTML', false, tableHTML);
+            document.getElementById('editor').focus();
+        }
+
+        function setDirection(dir) {
+            if (isCodeView) return;
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+
+            let node = selection.anchorNode;
+            let blockFound = false;
+
+            while (node && node.id !== 'editor') {
+                if (node.nodeType === 1) {
+                    const displayStyle = window.getComputedStyle(node).display;
+                    if (displayStyle === 'block' || displayStyle === 'list-item') {
+                        node.setAttribute('dir', dir);
+                        node.style.textAlign = dir === 'ltr' ? 'left' : 'right';
+                        blockFound = true;
+                        break;
+                    }
+                }
+                node = node.parentNode;
+            }
+
+            if (!blockFound) {
+                document.execCommand('formatBlock', false, 'p');
+                setDirection(dir);
+            }
+
+            document.getElementById('editor').focus();
+        }
+
+        function copyContent() {
+            const editor = document.getElementById('editor');
+            const textToCopy = isCodeView ? editor.innerText : (editor.innerText || editor.textContent);
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast('متن در کلیپ‌بورد کپی شد!');
+            }).catch(err => {
+                console.error('خطا در کپی: ', err);
+                alert('مرورگر شما از قابلیت کپی پشتیبانی نمی‌کند.');
+            });
+        }
+
+        const themeBtn = document.getElementById('themeBtn');
+        const root = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+            themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = root.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                root.removeAttribute('data-theme');
+                themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+                localStorage.setItem('theme', 'light');
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+</body>
+</html>
