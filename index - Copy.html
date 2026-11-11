@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویزارد تعاملی مدیریت درمان آمبولی ریوی (PE)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="assets/css/tailwind.css"></script>
+    <!-- Vazirmatn Font CDN -->
+    <link href="assets/fonts/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Lucide Icons -->
+    <script src="assets/js/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#035485',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                        },
+                        warning: {
+                            50: '#fffbebe',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-medical-900 via-medical-800 to-medical-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-white/10 p-2 rounded-xl backdrop-blur-md">
+                    <i data-lucide="activity" class="w-7 h-7 text-sky-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">ویزارد تعاملی مدیریت آمبولی ریوی (PE)</h1>
+                    <p class="text-xs text-sky-200">بر اساس گایدلاین UpToDate (مرجع بالینی درمان و ارزیابی PE)</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-2 space-x-reverse text-xs bg-medical-800/80 px-3 py-1.5 rounded-lg border border-medical-600">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-amber-300"></i>
+                <span>راهنمای تصمیم‌گیری بالینی ویژه پزشکان و کادر درمان</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-grow w-full">
+
+        <!-- Progress Steps Bar -->
+        <nav aria-label="Progress" class="mb-8 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <ol role="list" class="space-y-4 md:flex md:space-y-0 md:space-x-4 md:space-x-reverse" id="steps-nav">
+                <!-- Dynamic Steps via JS -->
+            </ol>
+        </nav>
+
+        <!-- Wizard Step Contents Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Main Step Card (8 Cols) -->
+            <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between min-h-[580px]">
+                
+                <div id="step-content">
+                    <!-- Dynamic Step HTML injected by JS -->
+                </div>
+
+                <!-- Footer Navigation Buttons -->
+                <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+                    <button id="prev-btn" onclick="changeStep(-1)" class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                        <i data-lucide="chevron-right" class="w-4 h-4 ml-1"></i>
+                        مرحله قبل
+                    </button>
+
+                    <div class="text-xs text-slate-400 hidden sm:block">
+                        مرحله <span id="current-step-num">1</span> از ۵
+                    </div>
+
+                    <button id="next-btn" onclick="changeStep(1)" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-medical-600 rounded-xl hover:bg-medical-700 shadow-md shadow-medical-500/20 transition">
+                        مرحله بعد
+                        <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Decision Summary & Protocol Panel (4 Cols) -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Patient Profile Live Summary -->
+                <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-medical-500/10 rounded-full blur-2xl"></div>
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                        <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-sky-400"></i>
+                            خلاصه وضعیت بیمار
+                        </h3>
+                        <span id="risk-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300">
+                            نامشخص
+                        </span>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">ثبات همودینامیک:</span>
+                            <span id="summary-stability" class="font-semibold text-slate-200">ارزیابی نشده</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">امتیاز معیار Wells:</span>
+                            <span id="summary-wells" class="font-semibold text-slate-200">0 (کم)</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">خطر خونریزی:</span>
+                            <span id="summary-bleeding" class="font-semibold text-slate-200">پایین</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">اختلال بطن راست (RV):</span>
+                            <span id="summary-rv" class="font-semibold text-slate-200">منفی</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">بیومارکرهای قلبی:</span>
+                            <span id="summary-biomarker" class="font-semibold text-slate-200">منفی</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">منع ترومبولیز:</span>
+                            <span id="summary-thrombolysis-contra" class="font-semibold text-slate-200">بدون منع</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+                            <span class="text-slate-400">وضعیت تعبیه فیلتر IVC:</span>
+                            <span id="summary-ivc" class="font-semibold text-slate-200">غیرضروری</span>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Protocol Directives -->
+                    <div class="mt-5 bg-slate-800/90 rounded-xl p-3.5 border border-slate-700/80">
+                        <div class="text-xs font-bold text-sky-400 mb-1.5 flex items-center gap-1.5">
+                            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                            پروتکل پیشنهادی گام‌به‌گام:
+                        </div>
+                        <div id="dynamic-recommendation" class="text-xs text-slate-300 leading-relaxed space-y-1">
+                            جهت مشاهده پروتکل درمانی دقیق، گزینه‌های مراحل را تکمیل کنید.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fast Reference Card -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <h4 class="font-bold text-xs text-slate-700 mb-3 flex items-center gap-2">
+                        <i data-lucide="info" class="w-4 h-4 text-medical-600"></i>
+                        نکات کلیدی احیا و مانیتورینگ
+                    </h4>
+                    <ul class="text-xs text-slate-600 space-y-2 leading-relaxed list-disc list-inside">
+                        <li>هدف اشباع اکسیژن: <strong class="text-slate-800">SpO2 ≥ 90%</strong></li>
+                        <li>مایع‌درمانی وریدی محدود: <strong class="text-slate-800">500 - 1000 mL</strong> (حجم بالا باعث Overstretch و ایسکمی بطن راست می‌شود).</li>
+                        <li>داروی واسوپرسور خط اول: <strong class="text-slate-800">نوراپی‌نفرین</strong> (احتمال تاکیکاردی کمتر).</li>
+                        <li>در بیماران ناپایدار همودینامیک با افت فشار خون، <strong class="text-slate-800">هپارین معمولی (UFH)</strong> به دلیل امکان معکوس‌سازی سریع ارجح است.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>
+                منبع اصلی: UpToDate - Treatment, prognosis, and follow-up of acute pulmonary embolism in adults
+            </div>
+            <div>
+                طراحی تعاملی برای تصمیم‌گیری سریع در اورژانس و ICU
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State Management
+        let currentStep = 1;
+
+        const state = {
+            hemodynamic: 'stable', // 'stable' | 'unstable'
+            wellsScore: 0,
+            wellsFactors: {
+                dvtSigns: false, // 3.0
+                peLikely: false, // 3.0
+                hr100: false,    // 1.5
+                immobilization: false, // 1.5
+                priorVte: false, // 1.5
+                hemoptysis: false, // 1.0
+                cancer: false     // 1.0
+            },
+            bleedingRisk: 'low', // 'low' | 'moderate' | 'high'
+            bleedingFactors: {
+                recentSurgery: false,
+                activeBleeding: false,
+                hemorrhagicStroke: false,
+                ageOver75: false,
+                antiplatelet: false,
+                renalHepatic: false
+            },
+            diagnosticTiming: '<4h',
+            rvDysfunction: false,
+            biomarkersPositive: false,
+            
+            // Interactive Thrombolysis Contraindication Factors
+            thrombolysisContraindications: {
+                hemorrhagicStroke: false,
+                ischemicStroke6m: false,
+                cnsNeoplasm: false,
+                majorTraumaSurgery3w: false,
+                activeBleeding: false,
+                aorticDissection: false,
+                tia6m: false,
+                oralAnticoagulant: false,
+                pregnancy1wPostpartum: false,
+                uncontrolledHTN: false,
+                activeLiverDisease: false,
+                prolongedCpr: false
+            },
+
+            // Interactive Invasive Procedure Factors
+            invasiveParams: {
+                catheterAvailable: true,
+                surgicalTeamAvailable: true,
+                failedThrombolysis: false
+            },
+
+            // Interactive IVC Filter Factors
+            ivcParams: {
+                absoluteAnticoagContra: false,
+                hasProximalDVT: false,
+                recurrentPEOnAnticoag: false,
+                poorCardiopulmonaryReserve: false
+            }
+        };
+
+        const stepsConfig = [
+            { id: 1, title: 'ثبات همودینامیک', icon: 'heart-pulse' },
+            { id: 2, title: 'احیا و پشتیبانی', icon: 'activity' },
+            { id: 3, title: 'احتمال بالینی و ضد انعقاد', icon: 'shield-check' },
+            { id: 4, title: 'طبقه‌بندی خطر و خط اول', icon: 'layers' },
+            { id: 5, title: 'ترومبولیز و مداخلات', icon: 'zap' }
+        ];
+
+        // Init App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNavSteps();
+            renderStepContent();
+            updateSummary();
+            lucide.createIcons();
+        });
+
+        // Step Navigation Bar
+        function renderNavSteps() {
+            const navContainer = document.getElementById('steps-nav');
+            navContainer.innerHTML = stepsConfig.map((s) => {
+                const isActive = s.id === currentStep;
+                const isPassed = s.id < currentStep;
+
+                let stateClasses = "border-slate-200 text-slate-400";
+                if (isActive) stateClasses = "border-medical-600 text-medical-600 font-bold bg-medical-50/50";
+                if (isPassed) stateClasses = "border-sky-500 text-sky-600 font-medium";
+
+                return `
+                    <li class="md:flex-1">
+                        <button onclick="goToStep(${s.id})" class="w-full text-right group py-2 px-3 flex flex-col border-r-4 md:border-r-0 md:border-t-4 ${stateClasses} transition">
+                            <span class="text-[10px] uppercase font-bold tracking-wider ${isActive ? 'text-medical-600' : 'text-slate-400'}">
+                                گام ${s.id}
+                            </span>
+                            <span class="text-xs font-semibold flex items-center gap-1.5 mt-0.5">
+                                <i data-lucide="${s.icon}" class="w-3.5 h-3.5"></i>
+                                ${s.title}
+                            </span>
+                        </button>
+                    </li>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function goToStep(stepNum) {
+            if (stepNum >= 1 && stepNum <= 5) {
+                currentStep = stepNum;
+                renderNavSteps();
+                renderStepContent();
+                updateSummary();
+            }
+        }
+
+        function changeStep(delta) {
+            goToStep(currentStep + delta);
+        }
+
+        // Calculation Helpers
+        function calculateWellsScore() {
+            let score = 0;
+            if (state.wellsFactors.dvtSigns) score += 3.0;
+            if (state.wellsFactors.peLikely) score += 3.0;
+            if (state.wellsFactors.hr100) score += 1.5;
+            if (state.wellsFactors.immobilization) score += 1.5;
+            if (state.wellsFactors.priorVte) score += 1.5;
+            if (state.wellsFactors.hemoptysis) score += 1.0;
+            if (state.wellsFactors.cancer) score += 1.0;
+            state.wellsScore = score;
+            return score;
+        }
+
+        function calculateBleedingRisk() {
+            if (state.bleedingFactors.recentSurgery || state.bleedingFactors.activeBleeding || state.bleedingFactors.hemorrhagicStroke) {
+                state.bleedingRisk = 'high';
+            } else if (state.bleedingFactors.ageOver75 || state.bleedingFactors.antiplatelet || state.bleedingFactors.renalHepatic) {
+                state.bleedingRisk = 'moderate';
+            } else {
+                state.bleedingRisk = 'low';
+            }
+            return state.bleedingRisk;
+        }
+
+        function checkThrombolysisContraindications() {
+            const c = state.thrombolysisContraindications;
+            const hasAbsolute = c.hemorrhagicStroke || c.ischemicStroke6m || c.cnsNeoplasm || c.majorTraumaSurgery3w || c.activeBleeding || c.aorticDissection;
+            const hasRelative = c.tia6m || c.oralAnticoagulant || c.pregnancy1wPostpartum || c.uncontrolledHTN || c.activeLiverDisease || c.prolongedCpr;
+
+            if (hasAbsolute) return 'absolute';
+            if (hasRelative) return 'relative';
+            return 'none';
+        }
+
+        function checkIvcFilterIndication() {
+            const p = state.ivcParams;
+            if (p.absoluteAnticoagContra && p.hasProximalDVT) return 'indicated_absolute';
+            if (p.recurrentPEOnAnticoag) return 'indicated_recurrent';
+            if (p.absoluteAnticoagContra) return 'borderline_no_dvt';
+            return 'not_indicated';
+        }
+
+        function getRiskCategory() {
+            if (state.hemodynamic === 'unstable') {
+                return { name: 'آمبولی با خطر بالا (Massive PE)', color: 'bg-red-500 text-white', class: 'high-risk' };
+            }
+            if (state.rvDysfunction && state.biomarkersPositive) {
+                return { name: 'خطر متوسط-بالا (Submassive High)', color: 'bg-amber-500 text-white', class: 'intermediate-high' };
+            }
+            if (state.rvDysfunction || state.biomarkersPositive) {
+                return { name: 'خطر متوسط-پایین (Submassive Low)', color: 'bg-amber-400 text-slate-900', class: 'intermediate-low' };
+            }
+            return { name: 'آمبولی با خطر پایین (Low Risk)', color: 'bg-emerald-500 text-white', class: 'low-risk' };
+        }
+
+        // Render Individual Steps
+        function renderStepContent() {
+            const container = document.getElementById('step-content');
+            document.getElementById('current-step-num').innerText = currentStep;
+
+            document.getElementById('prev-btn').disabled = (currentStep === 1);
+            const nextBtn = document.getElementById('next-btn');
+            if (currentStep === 5) {
+                nextBtn.innerHTML = `پایان و جمع‌بندی <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>`;
+            } else {
+                nextBtn.innerHTML = `مرحله بعد <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i>`;
+            }
+
+            switch (currentStep) {
+                case 1:
+                    renderStep1(container);
+                    break;
+                case 2:
+                    renderStep2(container);
+                    break;
+                case 3:
+                    renderStep3(container);
+                    break;
+                case 4:
+                    renderStep4(container);
+                    break;
+                case 5:
+                    renderStep5(container);
+                    break;
+            }
+            lucide.createIcons();
+        }
+
+        // STEP 1: Hemodynamic Stability Assessment
+        function renderStep1(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-medical-50 text-medical-700 text-xs font-bold mb-2">
+                            گام اول: غربالگری اولیه همودینامیک
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">ارزیابی ثبات همودینامیک بیمار</h2>
+                        <p class="text-xs text-slate-500 mt-1">بر اساس تعریف UpToDate، افت فشار خون تعیین‌کننده مسیر فوری درمانی (Massive vs Non-Massive) است.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Unstable Card -->
+                        <div onclick="setHemodynamic('unstable')" class="cursor-pointer rounded-2xl p-5 border-2 transition relative ${state.hemodynamic === 'unstable' ? 'border-danger-500 bg-danger-50/50 shadow-md' : 'border-slate-200 hover:border-slate-300 bg-white'}">
+                            <div class="flex items-start justify-between">
+                                <div class="p-2.5 rounded-xl ${state.hemodynamic === 'unstable' ? 'bg-danger-500 text-white' : 'bg-slate-100 text-slate-600'}">
+                                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                                </div>
+                                ${state.hemodynamic === 'unstable' ? '<span class="text-xs font-bold bg-danger-600 text-white px-2 py-0.5 rounded-full">انتخاب شده</span>' : ''}
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-base mt-3">ناپایدار همودینامیک (Massive PE)</h3>
+                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                بیمار دارای **حداقل یکی** از معیارهای زیر است:
+                            </p>
+                            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+                                <li>فشار خون سیستولیک <strong class="text-danger-600">&lt; 90 mmHg</strong> برای بیش از ۱۵ دقیقه</li>
+                                <li>نیاز به داروی واسوپرسور برای حفظ فشار خون</li>
+                                <li>شواهد آشکار شوک (کاهش سطح هوشیاری، الیگوری، انقباض عروق محیطی)</li>
+                            </ul>
+                        </div>
+
+                        <!-- Stable Card -->
+                        <div onclick="setHemodynamic('stable')" class="cursor-pointer rounded-2xl p-5 border-2 transition relative ${state.hemodynamic === 'stable' ? 'border-medical-500 bg-medical-50/50 shadow-md' : 'border-slate-200 hover:border-slate-300 bg-white'}">
+                            <div class="flex items-start justify-between">
+                                <div class="p-2.5 rounded-xl ${state.hemodynamic === 'stable' ? 'bg-medical-500 text-white' : 'bg-slate-100 text-slate-600'}">
+                                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                                </div>
+                                ${state.hemodynamic === 'stable' ? '<span class="text-xs font-bold bg-medical-600 text-white px-2 py-0.5 rounded-full">انتخاب شده</span>' : ''}
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-base mt-3">پایدار همودینامیک (Non-Massive / Stable)</h3>
+                            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                                بیمار فاقد معیارهای تعریف‌شده برای شوک و هیپوتانسیون پایداری است (شامل طیف خطر پایین تا Submassive).
+                            </p>
+                            <ul class="text-xs text-slate-700 mt-2 space-y-1 list-disc list-inside">
+                                <li>فشار خون سیستولیک طبیعی (≥ 90 mmHg)</li>
+                                <li>عدم نیاز به واسوپرسور</li>
+                                <li>پرفیوژن بافتی قابل قبول</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    ${state.hemodynamic === 'unstable' ? `
+                        <div class="p-4 bg-danger-50 rounded-xl border border-danger-200 text-xs text-danger-800 space-y-1">
+                            <div class="font-bold flex items-center gap-1.5 text-danger-700">
+                                <i data-lucide="siren" class="w-4 h-4"></i>
+                                هشدارهای حیاتی در بیماران ناپایدار:
+                            </div>
+                            <p>۱. ارزیابی سریع سونوگرافی بستر بیمار (Bedside Echo) در صورت عدم امکان انتقال به سی‌تی آنژیوگرافی (CTPA).</p>
+                            <p>۲. آماده‌سازی برای فیبرینولیز سیستمیک (ترومبولیز) نجات‌بخش یا مداخلات کاتتر/جراحی.</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function setHemodynamic(type) {
+            state.hemodynamic = type;
+            renderStepContent();
+            updateSummary();
+        }
+
+        // STEP 2: Resuscitation and Supportive Care
+        function renderStep2(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-medical-50 text-medical-700 text-xs font-bold mb-2">
+                            گام دوم: اقدامات حمایتی و احیا
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">پشتیبانی تنفسی و همودینامیک (Resuscitation)</h2>
+                        <p class="text-xs text-slate-500 mt-1">اقدامات حمایتی همزمان با ارزیابی‌های تشخیصی طبق توصیه UpToDate</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Oxygen & Respiratory -->
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+                            <div class="flex items-center gap-2 font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">
+                                <i data-lucide="wind" class="w-4 h-4 text-sky-500"></i>
+                                حمایت تنفسی (Respiratory Support)
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                                    <strong class="text-slate-800">هدف اکسیژن‌رسانی:</strong> حفظ اشباع اکسیژن بالای <strong>SpO2 ≥ 90%</strong> با کانول بینی یا ماسک.
+                                </div>
+                                <div class="p-2 bg-white rounded-lg border border-slate-200 text-amber-800 bg-amber-50/50 border-amber-200">
+                                    <strong class="font-bold">هشدار انتوباسیون:</strong> بیماران مبتلا به نارسایی RV در معرض افت شدید فشار خون هنگام انتوباسیون هستند.
+                                    <br>• از فشارهای بالای Plateau در تهویه مکانیکی اجتناب کنید.
+                                    <br>• مشاوره سریع با بیهوشی قلب توصیه می‌شود.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fluids & Vasopressors -->
+                        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+                            <div class="flex items-center gap-2 font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">
+                                <i data-lucide="droplet" class="w-4 h-4 text-rose-500"></i>
+                                مایع‌درمانی و واسوپرسور
+                            </div>
+                            <div class="text-xs text-slate-600 space-y-2 leading-relaxed">
+                                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                                    <strong class="text-slate-800">مایع‌درمانی وریدی (IVF):</strong>
+                                    حدود <span class="font-bold text-medical-700">500 تا 1000 mL</span> نرمال سالین با احتیاط فراوان.
+                                    <p class="text-[11px] text-slate-500 mt-1">نکته: مایع‌درمانی تهاجمی باعث کشیدگی بیش از حد بطن راست (RV Overstretch) و ایسکمی آن می‌شود.</p>
+                                </div>
+
+                                <div class="p-2 bg-white rounded-lg border border-slate-200">
+                                    <strong class="text-slate-800">انتخاب واسوپرسور (خط اول):</strong>
+                                    <strong class="text-medical-600">نوراپی‌نفرین (Norepinephrine)</strong> داروی ارجح است (عدم ایجاد تاکیکاردی شدید در مقایسه با دوپامین/اپینفرین).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vasopressor Quick Table -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+                        <div class="bg-slate-100 p-2.5 font-bold text-slate-700 border-b border-slate-200">
+                            جدول خلاصه دارویی پشتیبانی همودینامیک
+                        </div>
+                        <div class="divide-y divide-slate-100 bg-white">
+                            <div class="p-2.5 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-slate-800">Norepinephrine</span>
+                                    <span class="text-slate-500 block text-[11px]">خط اول در شوک آمبولی</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">خط اول انتخاب</span>
+                            </div>
+                            <div class="p-2.5 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-slate-800">Dobutamine</span>
+                                    <span class="text-slate-500 block text-[11px]">جهت افزایش قدرت انقباضی (معمولاً همراه با نوراپی‌نفرین)</span>
+                                </div>
+                                <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-medium">خط دوم / ترکیبی</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // STEP 3: Clinical Probability & Empiric Anticoagulation
+        function renderStep3(container) {
+            calculateWellsScore();
+            calculateBleedingRisk();
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-medical-50 text-medical-700 text-xs font-bold mb-2">
+                            گام سوم: سنجش احتمال بالینی و ضد انعقاد تجربی
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">معیار Wells و تصمیم‌گیری ضد انعقاد تجربی</h2>
+                        <p class="text-xs text-slate-500 mt-1">تعیین لزوم شروع ضد انعقاد پیش از آماده‌شدن نتایج قطعی پاراکلینیک</p>
+                    </div>
+
+                    <!-- Wells Calculator Block -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="calculator" class="w-4 h-4 text-medical-600"></i>
+                                محاسبه‌گر آنلاین امتیاز Wells
+                            </h3>
+                            <div class="text-xs font-bold bg-medical-600 text-white px-2.5 py-1 rounded-lg">
+                                امتیاز Wells: ${state.wellsScore} (${state.wellsScore > 6 ? 'احتمال بالا' : state.wellsScore >= 2 ? 'احتمال متوسط' : 'احتمال پایین'})
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('dvtSigns')" ${state.wellsFactors.dvtSigns ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>علائم بالینی DVT (علائم تورم یا درد ساق) (+3.0)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('peLikely')" ${state.wellsFactors.peLikely ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>تشخیص‌های جایگزین احتمال کمتری از PE دارند (+3.0)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('hr100')" ${state.wellsFactors.hr100 ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>ضربان قلب &gt; 100 بار در دقیقه (+1.5)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('immobilization')" ${state.wellsFactors.immobilization ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>بی‌حرکتی ≥ 3 روز یا جراحی در ۴ هفته گذشته (+1.5)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('priorVte')" ${state.wellsFactors.priorVte ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>سابقه قبلی DVT یا PE ثبت‌شده (+1.5)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50">
+                                <input type="checkbox" onchange="toggleWells('hemoptysis')" ${state.wellsFactors.hemoptysis ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>هموپتیزی (خلط خونی) (+1.0)</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100/50 col-span-1 md:col-span-2">
+                                <input type="checkbox" onchange="toggleWells('cancer')" ${state.wellsFactors.cancer ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>بدخیمی/سرطان (تحت درمان فعال یا در ۶ ماه اخیر) (+1.0)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Bleeding Risk Assessment -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="alert-octagon" class="w-4 h-4 text-rose-600"></i>
+                                ارزیابی فاکتورهای خطر خونریزی (Bleeding Risk)
+                            </h3>
+                            <div class="text-xs font-bold bg-slate-800 text-white px-2.5 py-1 rounded-lg">
+                                خطر خونریزی: ${state.bleedingRisk === 'high' ? 'غیرقابل قبول / مطلق' : state.bleedingRisk === 'moderate' ? 'متوسط' : 'پایین'}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleBleeding('recentSurgery')" ${state.bleedingFactors.recentSurgery ? 'checked' : ''} class="rounded text-rose-600">
+                                <span class="text-rose-700 font-medium">جراحی یا ترومای اخیر / جراحی مغز و نخاع</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleBleeding('activeBleeding')" ${state.bleedingFactors.activeBleeding ? 'checked' : ''} class="rounded text-rose-600">
+                                <span class="text-rose-700 font-medium">خونریزی فعال داخلی یا گوارشی</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleBleeding('hemorrhagicStroke')" ${state.bleedingFactors.hemorrhagicStroke ? 'checked' : ''} class="rounded text-rose-600">
+                                <span class="text-rose-700 font-medium">سابقه سکته هموراژیک مغزی</span>
+                            </label>
+
+                            <label class="flex items-center space-x-2 space-x-reverse bg-white p-2 rounded-lg border border-slate-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleBleeding('ageOver75')" ${state.bleedingFactors.ageOver75 ? 'checked' : ''} class="rounded text-slate-700">
+                                <span>سن بالای ۷۵ سال یا خطر بالای زمین خوردن</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Expected Diagnostic Delay -->
+                    <div class="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl text-xs">
+                        <span class="font-bold text-slate-700">زمان تخمینی تا انجام تصویربرداری تشخیصی قطعی (CTPA):</span>
+                        <select onchange="setTiming(this.value)" class="bg-slate-100 border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800">
+                            <option value="<4h" ${state.diagnosticTiming === '<4h' ? 'selected' : ''}>کمتر از ۴ ساعت</option>
+                            <option value="4-24h" ${state.diagnosticTiming === '4-24h' ? 'selected' : ''}>بین ۴ تا ۲۴ ساعت</option>
+                            <option value=">24h" ${state.diagnosticTiming === '>24h' ? 'selected' : ''}>بیش از ۲۴ ساعت</option>
+                        </select>
+                    </div>
+
+                    <!-- Decision Recommendation Box -->
+                    <div class="p-4 rounded-xl border ${getEmpiricRecommendation().borderClass} ${getEmpiricRecommendation().bgClass} text-xs space-y-2">
+                        <div class="font-bold text-sm flex items-center gap-2 ${getEmpiricRecommendation().textClass}">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                            توصیه ضد انعقاد تجربی (Empiric Anticoagulation):
+                        </div>
+                        <p class="leading-relaxed text-slate-800">${getEmpiricRecommendation().text}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleWells(factor) {
+            state.wellsFactors[factor] = !state.wellsFactors[factor];
+            renderStepContent();
+            updateSummary();
+        }
+
+        function toggleBleeding(factor) {
+            state.bleedingFactors[factor] = !state.bleedingFactors[factor];
+            renderStepContent();
+            updateSummary();
+        }
+
+        function setTiming(val) {
+            state.diagnosticTiming = val;
+            renderStepContent();
+            updateSummary();
+        }
+
+        function getEmpiricRecommendation() {
+            calculateWellsScore();
+            calculateBleedingRisk();
+
+            if (state.bleedingRisk === 'high') {
+                return {
+                    text: '<strong>ضد انعقاد تجربی ممنوع است!</strong> به دلیل ریسک بسیار بالای خونریزی، ضد انعقاد را شروع نکنید. ارزیابی تشخیصی (CTPA یا سونو) را تسریع کرده و در صورت تایید PE، تعبیه فیلتر IVC یا امبولکتومی را ارزیابی کنید.',
+                    bgClass: 'bg-rose-50',
+                    borderClass: 'border-rose-200',
+                    textClass: 'text-rose-800'
+                };
+            }
+
+            if (state.wellsScore > 6) {
+                return {
+                    text: '<strong>شروع فوری ضد انعقاد تجربی توصیه می‌شود.</strong> احتمال بالینی PE بالا است. تا آماده‌شدن CTPA درمان را به تأخیر نیندازید (انوکساپارین LMWH یا UFH).',
+                    bgClass: 'bg-emerald-50',
+                    borderClass: 'border-emerald-200',
+                    textClass: 'text-emerald-800'
+                };
+            }
+
+            if (state.wellsScore >= 2 && state.wellsScore <= 6) {
+                if (state.diagnosticTiming !== '<4h') {
+                    return {
+                        text: '<strong>شروع ضد انعقاد تجربی توصیه می‌شود.</strong> زیرا احتمال متوسط وجود دارد و تأخیر تشخیصی بیش از ۴ ساعت خواهد بود.',
+                        bgClass: 'bg-emerald-50',
+                        borderClass: 'border-emerald-200',
+                        textClass: 'text-emerald-800'
+                    };
+                } else {
+                    return {
+                        text: 'توصیه می‌شود تا آماده‌شدن تصویربرداری (کمتر از ۴ ساعت) منتظر بمانید و ضد انعقاد تجربی را قبل از تایید شروع نکنید.',
+                        bgClass: 'bg-sky-50',
+                        borderClass: 'border-sky-200',
+                        textClass: 'text-sky-800'
+                    };
+                }
+            }
+
+            if (state.diagnosticTiming === '>24h') {
+                return {
+                    text: 'ضد انعقاد تجربی تنها به دلیل تأخیر طولانی تشخیصی (&gt; 24 ساعت) مد نظر قرار گیرد.',
+                    bgClass: 'bg-amber-50',
+                    borderClass: 'border-amber-200',
+                    textClass: 'text-amber-800'
+                };
+            }
+
+            return {
+                text: '<strong>ضد انعقاد تجربی توصیه نمی‌شود.</strong> ابتدا آزمون‌های تشخیصی (D-Dimer یا CTPA) انجام شود.',
+                bgClass: 'bg-slate-100',
+                borderClass: 'border-slate-200',
+                textClass: 'text-slate-800'
+            };
+        }
+
+        // STEP 4: Risk Stratification & Definitive Therapy
+        function renderStep4(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-medical-50 text-medical-700 text-xs font-bold mb-2">
+                            گام چهارم: طبقه‌بندی خطر و انتخاب درمان قطعی
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">ارزیابی دیس‌فانکشن بطن راست و مارکرها</h2>
+                        <p class="text-xs text-slate-500 mt-1">تفکیک بیماران به دسته‌های Massive، Submassive و Low-Risk</p>
+                    </div>
+
+                    <!-- Interactive Findings Checklist -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                                <i data-lucide="activity-square" class="w-4 h-4 text-medical-600"></i>
+                                یافته‌های اکوکاردیوگرافی / سی‌تی‌اسکن (RV Dysfunction)
+                            </h3>
+                            <label class="flex items-center space-x-2 space-x-reverse text-xs cursor-pointer bg-white p-2.5 rounded-lg border border-slate-200">
+                                <input type="checkbox" onchange="toggleRv(this.checked)" ${state.rvDysfunction ? 'checked' : ''} class="rounded text-medical-600">
+                                <span>شواهد گشادشدگی بطن راست (RV Expansion) / علامت McConnell / هیپوکینزی بطن راست</span>
+                            </label>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                                <i data-lucide="flask-conical" class="w-4 h-4 text-purple-600"></i>
+                                بیومارکرهای آسیب/فشار قلبی (Biomarkers)
+                            </h3>
+                            <label class="flex items-center space-x-2 space-x-reverse text-xs cursor-pointer bg-white p-2.5 rounded-lg border border-slate-200">
+                                <input type="checkbox" onchange="toggleBiomarkers(this.checked)" ${state.biomarkersPositive ? 'checked' : ''} class="rounded text-purple-600">
+                                <span>افزایش سطح ترپونین (Troponin I/T) یا NT-proBNP / BNP</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Result Category Display -->
+                    <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3 shadow-md">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <span class="text-xs text-slate-400">دسته‌بندی نهایی خطر بیمار:</span>
+                            <span class="text-xs font-bold ${getRiskCategory().color} px-3 py-1 rounded-full">
+                                ${getRiskCategory().name}
+                            </span>
+                        </div>
+
+                        <div class="text-xs leading-relaxed space-y-2 text-slate-300">
+                            ${getDefinitiveStrategyText()}
+                        </div>
+                    </div>
+
+                    <!-- Long term plan breakdown -->
+                    <div class="border border-slate-200 rounded-xl p-4 bg-white text-xs space-y-2">
+                        <h4 class="font-bold text-slate-800 border-b border-slate-100 pb-2">مدت زمان درمان ضدانعقاد (Long-term Duration):</h4>
+                        <ul class="space-y-1 text-slate-600 list-disc list-inside">
+                            <li><strong>علت موقت/ثانویه (Provoked VTE):</strong> حداقل ۳ ماه درمان ضدانعقاد.</li>
+                            <li><strong>بدون علت مشخص (Unprovoked VTE) یا کانسر فعال:</strong> درمان طولانی‌مدت/نامحدود (Indefinite) با ارزیابی دوره‌ای خطر خونریزی.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleRv(val) {
+            state.rvDysfunction = val;
+            renderStepContent();
+            updateSummary();
+        }
+
+        function toggleBiomarkers(val) {
+            state.biomarkersPositive = val;
+            renderStepContent();
+            updateSummary();
+        }
+
+        function getDefinitiveStrategyText() {
+            if (state.hemodynamic === 'unstable') {
+                return `
+                    <strong class="text-rose-400 block mb-1">استراتژی خط اول در آمبولی ماسیو (High-Risk):</strong>
+                    درمان انتخاب اول، <strong>ترومبولیز سیستمیک (Systemic Thrombolysis)</strong> فوری یا مداخلات مکانیکی نجات‌بخش (کاتتر/امبولکتومی) به همراه هپارین وریدی UFH است.
+                `;
+            }
+            if (state.rvDysfunction && state.biomarkersPositive) {
+                return `
+                    <strong class="text-amber-400 block mb-1">استراتژی در آمبولی Submassive (خطر متوسط-بالا):</strong>
+                    درمان پایه با <strong>ضد انعقاد درمانی (LMWH یا DOAC)</strong> همراه با مانیتورینگ بسیار دقیق در بخش مراقبت‌های ویژه (ICU). ترومبولیز روتین توصیه نمی‌شود؛ مگر در صورت بروز زوال بالینی (Rescue Thrombolysis).
+                `;
+            }
+            if (state.rvDysfunction || state.biomarkersPositive) {
+                return `
+                    <strong class="text-amber-300 block mb-1">استراتژی در آمبولی Submassive (خطر متوسط-پایین):</strong>
+                    درمان ضد انعقاد پایش‌شده (LMWH یا DOACs مانند آپیکسابان/ریواروکسابان) و بستری در بیمارستان.
+                `;
+            }
+            return `
+                <strong class="text-emerald-400 block mb-1">استراتژی در آمبولی کم‌خطر (Low-Risk PE):</strong>
+                درمان ضد انعقاد خوراکی مستقیم (DOACs) به عنوان خط اول. در بیماران دارای معیارهای واجد شرایط، امکان ترخیص زودهنگام و ادامه درمان سرپایی وجود دارد.
+            `;
+        }
+
+        // STEP 5: Thrombolysis & Interactive Contraindications & Conditional Advanced Interventions
+        function renderStep5(container) {
+            const contraStatus = checkThrombolysisContraindications();
+            const ivcIndication = checkIvcFilterIndication();
+            
+            // Check if invasive section should be visible
+            const shouldShowInvasive = contraStatus !== 'none' || state.invasiveParams.failedThrombolysis;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-medical-50 text-medical-700 text-xs font-bold mb-2">
+                            گام پنجم: پروتکل ترومبولیز، تحلیل تهاجمی و فیلتر IVC
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">سنجش تعاملی ترومبولیز، CDT و فیلتر IVC</h2>
+                        <p class="text-xs text-slate-500 mt-1">مدیریت تعاملی خط دوم درمان در موارد منع ترومبولیز یا عود آمبولی</p>
+                    </div>
+
+                    <!-- Thrombolysis Dosage Card -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5 border-b border-slate-200 pb-2">
+                            <i data-lucide="syringe" class="w-4 h-4 text-medical-600"></i>
+                            رژیم دوزبندی Alteplase (rtPA)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                <strong class="text-slate-800 block mb-1">رژیم استاندارد (Standard Protocol):</strong>
+                                <span class="text-medical-700 font-bold text-sm">100 mg IV طی ۲ ساعت</span>
+                                <p class="text-slate-500 text-[11px] mt-1">قطع هپارین UFH در زمان انفوزیون Alteplase و شروع مجدد پس از آن.</p>
+                            </div>
+
+                            <div class="bg-white p-3 rounded-lg border border-slate-200">
+                                <strong class="text-slate-800 block mb-1">رژیم سریع اورژانسی (Accelerated):</strong>
+                                <span class="text-rose-600 font-bold text-sm">0.6 mg/kg (حداکثر 50 mg) طی ۱۵ دقیقه</span>
+                                <p class="text-slate-500 text-[11px] mt-1">مخصوص شرایط ایست قلبی یا شوک بسیار شدید پیشرفته.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Contraindication Checklist Section -->
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <h3 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="shield-alert" class="w-4 h-4 text-rose-600"></i>
+                                چک‌لیست تعاملی ممنوعیت‌های تزریق ترومبولیتیک (Alteplase)
+                            </h3>
+                            <button onclick="resetThrombolysisContra()" class="text-[11px] text-slate-500 hover:text-rose-600 underline">
+                                بازنشانی همه
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <!-- Absolute Group -->
+                            <div class="space-y-2 bg-white p-3 rounded-xl border border-rose-100 shadow-sm">
+                                <div class="font-bold text-rose-800 flex items-center gap-1 border-b border-rose-100 pb-1.5">
+                                    <i data-lucide="alert-octagon" class="w-3.5 h-3.5"></i>
+                                    ممنوعیت‌های مطلق (Absolute)
+                                </div>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('hemorrhagicStroke')" ${state.thrombolysisContraindications.hemorrhagicStroke ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">سابقه سکته هموراژیک مغزی (در هر زمان)</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('ischemicStroke6m')" ${state.thrombolysisContraindications.ischemicStroke6m ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">سکته مغزی ایسکمیک در ۶ ماه گذشته</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('cnsNeoplasm')" ${state.thrombolysisContraindications.cnsNeoplasm ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">ضایعه structural، تومور یا بدخیمی CNS</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('majorTraumaSurgery3w')" ${state.thrombolysisContraindications.majorTraumaSurgery3w ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">تروما یا جراحی بزرگ اخیر/سر (در ۳ هفته گذشته)</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('activeBleeding')" ${state.thrombolysisContraindications.activeBleeding ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">خونریزی فعال داخلی (بغیر از پریود)</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-rose-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('aorticDissection')" ${state.thrombolysisContraindications.aorticDissection ? 'checked' : ''} class="mt-0.5 rounded text-rose-600">
+                                    <span class="text-slate-700">شک بالینی یا تایید دایسکشن آئورت</span>
+                                </label>
+                            </div>
+
+                            <!-- Relative Group -->
+                            <div class="space-y-2 bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
+                                <div class="font-bold text-amber-800 flex items-center gap-1 border-b border-amber-100 pb-1.5">
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                                    ممنوعیت‌های نسبی (Relative)
+                                </div>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('tia6m')" ${state.thrombolysisContraindications.tia6m ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">سابقه حمله ایسکمیک گذرا (TIA) در ۶ ماه گذشته</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('oralAnticoagulant')" ${state.thrombolysisContraindications.oralAnticoagulant ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">مصرف همزمان ضدانعقاد خوراکی (وارفارین/DOACs)</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('pregnancy1wPostpartum')" ${state.thrombolysisContraindications.pregnancy1wPostpartum ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">بارداری یا هفته اول پس از زایمان</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('uncontrolledHTN')" ${state.thrombolysisContraindications.uncontrolledHTN ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">فشارخون کنترل‌نشده شدید (SBP &gt; 180 mmHg)</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('activeLiverDisease')" ${state.thrombolysisContraindications.activeLiverDisease ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">بیماری پیشرفته و فعال کبدی / اندوکاردیت</span>
+                                </label>
+
+                                <label class="flex items-start space-x-2 space-x-reverse cursor-pointer p-1 hover:bg-amber-50/50 rounded">
+                                    <input type="checkbox" onchange="toggleThromboContra('prolongedCpr')" ${state.thrombolysisContraindications.prolongedCpr ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                    <span class="text-slate-700">احیای قلبی ریوی (CPR) تروماتیک یا طولانی</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Analysis Box -->
+                        <div class="p-3.5 rounded-xl border text-xs transition-all ${getThromboAnalysis(contraStatus).boxClass}">
+                            <div class="font-bold text-sm flex items-center gap-1.5 mb-1 ${getThromboAnalysis(contraStatus).textClass}">
+                                <i data-lucide="${getThromboAnalysis(contraStatus).icon}" class="w-4 h-4"></i>
+                                تحلیل تعاملی امکان ترومبولیز:
+                            </div>
+                            <p class="leading-relaxed text-slate-800">${getThromboAnalysis(contraStatus).msg}</p>
+                        </div>
+                    </div>
+
+                    <!-- CONDITIONAL INVASIVE SELECTOR (ONLY SHOWN IF CONTRAINDICATION OR FAILURE EXISTS) -->
+                    ${shouldShowInvasive ? `
+                        <div class="border border-rose-200 rounded-xl p-4 bg-rose-50/30 space-y-4 animate-fadeIn">
+                            <div class="flex items-center justify-between border-b border-rose-200 pb-2">
+                                <h3 class="font-bold text-xs text-rose-900 flex items-center gap-1.5">
+                                    <i data-lucide="disc" class="w-4 h-4 text-rose-600"></i>
+                                    انتخاب‌گر تعاملی درمان‌های تهاجمی (به دلیل وجود منع ترومبولیز)
+                                </h3>
+                                <span class="text-[11px] font-bold text-rose-700">خط دوم درمان جایگزین</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                                <label class="flex items-center space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                                    <input type="checkbox" onchange="toggleInvasive('catheterAvailable')" ${state.invasiveParams.catheterAvailable ? 'checked' : ''} class="rounded text-medical-600">
+                                    <span>دسترسی به بخش اینترونشن / کاتتریزاسیون و کادر مجرب</span>
+                                </label>
+
+                                <label class="flex items-center space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer">
+                                    <input type="checkbox" onchange="toggleInvasive('surgicalTeamAvailable')" ${state.invasiveParams.surgicalTeamAvailable ? 'checked' : ''} class="rounded text-medical-600">
+                                    <span>حضور اتاق عمل جراحی قلب و بای‌پاس قلبی-ریوی (CPB)</span>
+                                </label>
+
+                                <label class="flex items-center space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-slate-200 cursor-pointer col-span-1 md:col-span-2">
+                                    <input type="checkbox" onchange="toggleInvasive('failedThrombolysis')" ${state.invasiveParams.failedThrombolysis ? 'checked' : ''} class="rounded text-rose-600">
+                                    <span class="text-rose-700 font-medium">عدم پاسخ / شکست ترومبولیز سیستمیک تزریق‌شده قبلی</span>
+                                </label>
+                            </div>
+
+                            <!-- Dynamic Invasive Recommendation Box -->
+                            <div class="p-3.5 bg-white rounded-xl border border-rose-200 shadow-sm text-xs space-y-2">
+                                <div class="font-bold flex items-center gap-1.5 text-rose-800 border-b border-slate-100 pb-1.5">
+                                    <i data-lucide="cpu" class="w-4 h-4 text-rose-600"></i>
+                                    گزینه تهاجمی پیشنهادی جایگزین ترومبولیز:
+                                </div>
+                                <div class="leading-relaxed text-slate-700">
+                                    ${getInvasiveRecommendationText()}
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- INTERACTIVE IVC FILTER DECISION CHECKER -->
+                    <div class="border border-amber-200 rounded-xl p-4 bg-amber-50/40 space-y-4">
+                        <div class="flex items-center justify-between border-b border-amber-200 pb-2">
+                            <h3 class="font-bold text-xs text-amber-900 flex items-center gap-1.5">
+                                <i data-lucide="filter" class="w-4 h-4 text-amber-600"></i>
+                                ارزیابی تعاملی اندیکاسیون تعبیه فیلتر IVC (Inferior Vena Cava Filter)
+                            </h3>
+                            <span class="text-[11px] font-bold text-amber-700">سنجش ضرورت فیلترگزاری</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <label class="flex items-start space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-amber-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleIvc('absoluteAnticoagContra')" ${state.ivcParams.absoluteAnticoagContra ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                <span>وجود **کنترااندیکاسیون مطلق و دائمی** برای دریافت ضد انعقاد</span>
+                            </label>
+
+                            <label class="flex items-start space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-amber-200 cursor-pointer">
+                                <input type="checkbox" onchange="toggleIvc('hasProximalDVT')" ${state.ivcParams.hasProximalDVT ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                <span>تایید DVT حاد پروگزیمال اندام تحتانی (سونوگرافی مثبت)</span>
+                            </label>
+
+                            <label class="flex items-start space-x-2 space-x-reverse bg-white p-2.5 rounded-lg border border-amber-200 cursor-pointer col-span-1 md:col-span-2">
+                                <input type="checkbox" onchange="toggleIvc('recurrentPEOnAnticoag')" ${state.ivcParams.recurrentPEOnAnticoag ? 'checked' : ''} class="mt-0.5 rounded text-amber-600">
+                                <span>**عود مجدد اثبات‌شده PE** علی‌رغم دریافت دوز کاملاً درمانی و صحیح ضد انعقاد</span>
+                            </label>
+                        </div>
+
+                        <!-- Dynamic IVC Result Box -->
+                        <div class="p-3.5 rounded-xl border text-xs transition-all ${getIvcAnalysis(ivcIndication).boxClass}">
+                            <div class="font-bold text-sm flex items-center gap-1.5 mb-1 ${getIvcAnalysis(ivcIndication).textClass}">
+                                <i data-lucide="${getIvcAnalysis(ivcIndication).icon}" class="w-4 h-4"></i>
+                                نتیجه ارزیابی فیلتر IVC:
+                            </div>
+                            <p class="leading-relaxed text-slate-800">${getIvcAnalysis(ivcIndication).msg}</p>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function toggleThromboContra(field) {
+            state.thrombolysisContraindications[field] = !state.thrombolysisContraindications[field];
+            renderStepContent();
+            updateSummary();
+        }
+
+        function resetThrombolysisContra() {
+            Object.keys(state.thrombolysisContraindications).forEach(k => {
+                state.thrombolysisContraindications[k] = false;
+            });
+            state.invasiveParams.failedThrombolysis = false;
+            renderStepContent();
+            updateSummary();
+        }
+
+        function toggleInvasive(field) {
+            state.invasiveParams[field] = !state.invasiveParams[field];
+            renderStepContent();
+            updateSummary();
+        }
+
+        function toggleIvc(field) {
+            state.ivcParams[field] = !state.ivcParams[field];
+            renderStepContent();
+            updateSummary();
+        }
+
+        function getThromboAnalysis(status) {
+            if (status === 'absolute') {
+                return {
+                    boxClass: 'bg-rose-50 border-rose-200 text-rose-900',
+                    textClass: 'text-rose-800',
+                    icon: 'x-circle',
+                    msg: '<strong>تزریق ترومبولیتیک (Alteplase) مطلقاً ممنوع است!</strong> بیمار دارای حداقل یک ممنوعیت مطلق خونریزی مرگبار است. در صورت ناپایداری همودینامیک، بخش انتخاب‌گر درمان‌های تهاجمی زیر فعال شده تا مناسب‌ترین روش (CDT/جراحی) تعیین گردد.'
+                };
+            }
+            if (status === 'relative') {
+                return {
+                    boxClass: 'bg-amber-50 border-amber-200 text-amber-900',
+                    textClass: 'text-amber-800',
+                    icon: 'alert-triangle',
+                    msg: '<strong>ممنوعیت نسبی وجود دارد.</strong> ترومبولیز تنها در صورت برتری قطعی منفعت بر خطر تزریق انجام شود. گزینه‌های تهاجمی زیر نیز فعال شده‌اند تا در صورت ترجیح عدم تزریق دارویی، جایگزین بررسی شود.'
+                };
+            }
+            return {
+                boxClass: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+                textClass: 'text-emerald-800',
+                icon: 'check-circle',
+                msg: '<strong>هیچ ممنوعیت شناخته‌شده‌ای برای ترومبولیز ثبت نشده است.</strong> در صورت حضور آمبولی ماسیو (افت فشار/شوک)، تزریق Alteplase بدون تأخیر طبق پروتکل توصیه می‌شود.'
+            };
+        }
+
+        function getInvasiveRecommendationText() {
+            const p = state.invasiveParams;
+            const contra = checkThrombolysisContraindications();
+
+            if (p.failedThrombolysis) {
+                if (p.surgicalTeamAvailable) {
+                    return `<strong>امبولکتومی جراحی (Surgical Embolectomy) یا کاتتر مکانیکی:</strong> با توجه به عدم پاسخ به ترومبولیز قبلی، ارزیابی فوری برای جراحی باز ریه با بای‌پاس قلبی-ریوی یا ترومبکتومی مکانیکی با کاتتر توصیه می‌شود.`;
+                }
+                return `<strong>ساکشن و تخریب مکانیکی با کاتتر (Catheter Thrombectomy):</strong> به دلیل عدم پاسخ به ترومبولیز سیستمیک، تخلیه مکانیکی لخته با کاتتر گزینه انتخابی است.`;
+            }
+
+            if (p.catheterAvailable) {
+                if (contra === 'absolute' || state.bleedingRisk === 'high') {
+                    return `<strong>ساکشن مکانیکی لخته (Catheter Mechanical Thrombectomy):</strong> به دلیل منع مطلق تزریق دارویی، استفاده از کاتترهای ساکشن/تخریب مکانیکی بدون تزریق ترومبولیتیک خط اول درمان تهاجمی است.`;
+                }
+                return `<strong>روش‌های کاتتر-محور با اولتراسوند (EKOS / Low-Dose CDT):</strong> استفاده از دوزهای بسیار پایین ترومبولیتیک همراه با امواج اولتراسوند جهت تسهیل حل شدن لخته.`;
+            }
+
+            if (p.surgicalTeamAvailable) {
+                return `<strong>امبولکتومی جراحی باز ریه (Surgical Embolectomy):</strong> در صورت عدم دسترسی به کاتتر پیشرفته یا وجود لخته بزرگ سنترال، جراحی باز نجات‌بخش ریوی اندیکاسیون دارد.`;
+            }
+
+            return `جهت اجرای روش‌های تهاجمی نیاز به هماهنگی سریع با بخش آنژیوگرافی/اینترونشن یا جراحی قلب وجود دارد. در صورت عدم امکان، انتقال ایمن بیمار تحت پایش دقیق مطرح می‌شود.`;
+        }
+
+        function getIvcAnalysis(indication) {
+            if (indication === 'indicated_absolute') {
+                return {
+                    boxClass: 'bg-amber-100 border-amber-300 text-amber-950',
+                    textClass: 'text-amber-900',
+                    icon: 'check-square',
+                    msg: '<strong>تعبیه فیلتر IVC کاملاً اندیکاسیون دارد!</strong> بیمار دارای DVT حاد پروگزیمال همزمان با منع مطلق ضدانعقاد است. پس از رفع ممنوعیت، ضدانعقاد باید شروع و فیلتر قابل‌بازیافت (Retrievable) در اولین فرصت خارج شود.'
+                };
+            }
+            if (indication === 'indicated_recurrent') {
+                return {
+                    boxClass: 'bg-amber-100 border-amber-300 text-amber-950',
+                    textClass: 'text-amber-900',
+                    icon: 'check-square',
+                    msg: '<strong>تعبیه فیلتر IVC اندیکاسیون دارد.</strong> آمبولی ریه علی‌رغم دوز کامل و صحیح ضدانعقاد عود کرده است. تعبیه موقت فیلتر IVC جهت جلوگیری از آمبولی‌های کشنده بعدی توصیه می‌شود.'
+                };
+            }
+            if (indication === 'borderline_no_dvt') {
+                return {
+                    boxClass: 'bg-slate-100 border-slate-300 text-slate-800',
+                    textClass: 'text-slate-800',
+                    icon: 'alert-circle',
+                    msg: '<strong>تعبیه فیلتر روتین توصیه نمی‌شود.</strong> با وجود منع ضدانعقاد، تا زمانی که DVT حاد پروگزیمال اندام تحتانی تایید نشده باشد، تعبیه روتین فیلتر IVC فایده اثبات‌شده‌ای ندارد (ابتدا سونوگرافی وریدی انجام شود).'
+                };
+            }
+            return {
+                boxClass: 'bg-slate-50 border-slate-200 text-slate-700',
+                textClass: 'text-slate-800',
+                icon: 'minus-circle',
+                msg: '<strong>تعبیه فیلتر IVC غیرضروری است.</strong> در بیماران بدون منع ضدانعقاد یا بدون عود اثبات‌شده، ضدانعقاد دارویی به‌تنهایی استاندارد درمانی بوده و فیلتر IVC توصیه نمی‌شود.'
+            };
+        }
+
+        // Update Live Summary Side Panel
+        function updateSummary() {
+            // Stability
+            const stabilityEl = document.getElementById('summary-stability');
+            if (state.hemodynamic === 'unstable') {
+                stabilityEl.innerText = 'ناپایدار (شوک/افت فشار)';
+                stabilityEl.className = 'font-semibold text-rose-400';
+            } else {
+                stabilityEl.innerText = 'پایدار (Normotensive)';
+                stabilityEl.className = 'font-semibold text-emerald-400';
+            }
+
+            // Wells
+            const wellsScore = calculateWellsScore();
+            const wellsEl = document.getElementById('summary-wells');
+            wellsEl.innerText = `${wellsScore} (${wellsScore > 6 ? 'احتمال بالا' : wellsScore >= 2 ? 'متوسط' : 'پایین'})`;
+
+            // Bleeding
+            const bleedingRisk = calculateBleedingRisk();
+            const bleedingEl = document.getElementById('summary-bleeding');
+            bleedingEl.innerText = bleedingRisk === 'high' ? 'بالا (مطلق)' : bleedingRisk === 'moderate' ? 'متوسط' : 'پایین';
+
+            // RV Dysfunction
+            const rvEl = document.getElementById('summary-rv');
+            rvEl.innerText = state.rvDysfunction ? 'مثبت (دارای اختلال)' : 'منفی / نرمال';
+
+            // Biomarker
+            const bioEl = document.getElementById('summary-biomarker');
+            bioEl.innerText = state.biomarkersPositive ? 'مثبت (افزایش‌یافته)' : 'منفی / نرمال';
+
+            // Thrombolysis Contra Summary
+            const contraStatus = checkThrombolysisContraindications();
+            const contraEl = document.getElementById('summary-thrombolysis-contra');
+            if (contraStatus === 'absolute') {
+                contraEl.innerText = 'ممنوعیت مطلق';
+                contraEl.className = 'font-semibold text-rose-400';
+            } else if (contraStatus === 'relative') {
+                contraEl.innerText = 'ممنوعیت نسبی';
+                contraEl.className = 'font-semibold text-amber-400';
+            } else {
+                contraEl.innerText = 'بدون منع';
+                contraEl.className = 'font-semibold text-emerald-400';
+            }
+
+            // IVC Summary
+            const ivcIndication = checkIvcFilterIndication();
+            const ivcEl = document.getElementById('summary-ivc');
+            if (ivcIndication === 'indicated_absolute' || ivcIndication === 'indicated_recurrent') {
+                ivcEl.innerText = 'توصیه‌شده / واجد شرایط';
+                ivcEl.className = 'font-semibold text-amber-400';
+            } else {
+                ivcEl.innerText = 'غیرضروری / عدم اندیکاسیون';
+                ivcEl.className = 'font-semibold text-slate-300';
+            }
+
+            // Risk Badge
+            const badge = document.getElementById('risk-badge');
+            const cat = getRiskCategory();
+            badge.innerText = cat.name;
+            badge.className = `px-2.5 py-0.5 rounded-full text-xs font-bold ${cat.color}`;
+
+            // Recommendation text
+            const recEl = document.getElementById('dynamic-recommendation');
+            if (state.hemodynamic === 'unstable') {
+                if (contraStatus === 'absolute') {
+                    recEl.innerHTML = `
+                        <div class="text-rose-300 font-bold">• تزریق سیستمیک ترومبولیز ممنوع است!</div>
+                        <div class="text-slate-200">• ارزیابی سریع کاتتر ترومبکتومی (CDT) یا جراحی</div>
+                        <div class="text-slate-300">• شروع هپارین وریدی UFH تحت پایش دقیق</div>
+                    `;
+                } else {
+                    recEl.innerHTML = `
+                        <div class="text-rose-300 font-bold">• شروع فوری UFH ناپیوسته</div>
+                        <div class="text-slate-200">• آماده‌سازی سریع جهت ترومبولیز سیستمیک (Alteplase 100mg)</div>
+                        <div class="text-slate-300">• پایش همودینامیک و فشار خون</div>
+                    `;
+                }
+            } else if (state.rvDysfunction && state.biomarkersPositive) {
+                recEl.innerHTML = `
+                    <div class="text-amber-300 font-bold">• ضد انعقاد پایه (LMWH/DOAC)</div>
+                    <div class="text-slate-200">• بستری در ICU و مانیتورینگ دقیق</div>
+                    <div class="text-slate-300">• آماده‌سازی برای Rescue Thrombolytic در صورت زوال بالینی</div>
+                `;
+            } else {
+                recEl.innerHTML = `
+                    <div class="text-emerald-300 font-bold">• شروع ضدانعقاد درمانی (DOACs / LMWH)</div>
+                    <div class="text-slate-200">• عدم نیاز به ترومبولیز سیستمیک</div>
+                    <div class="text-slate-300">• ارزیابی شرایط ترخیص زودهنگام سرپایی</div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
