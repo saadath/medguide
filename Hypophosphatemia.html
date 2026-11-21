@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hypophosphatemia Wizard — Diagnosis &amp; Management</title>
+<style>
+  :root{
+    --bg:#f5f8fc;
+    --card:#ffffff;
+    --ink:#0f172a;
+    --ink-2:#334155;
+    --muted:#64748b;
+    --line:#e5eaf3;
+    --accent:#2563eb;
+    --accent-2:#1d4ed8;
+    --radius:20px;
+    --shadow:0 12px 32px rgba(15,23,42,.08), 0 2px 6px rgba(15,23,42,.04);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+
+  body{
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(900px 500px at 0% -10%, #e6efff 0%, rgba(230,239,255,0) 60%),
+      radial-gradient(800px 400px at 100% 0%, #e9fbf2 0%, rgba(233,251,242,0) 55%),
+      var(--bg);
+    min-height:100vh;
+    padding:40px 18px 80px;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .wrap{ max-width:860px; margin:0 auto; }
+  .hidden{ display:none !important; }
+
+  /* Hero */
+  .hero{ display:flex; align-items:center; gap:16px; margin-bottom:26px; }
+  .hero-badge{
+    width:54px; height:54px; flex:none; border-radius:17px;
+    background:linear-gradient(135deg,#2563eb,#38bdf8);
+    display:grid; place-items:center; color:#fff;
+    box-shadow:0 10px 22px rgba(37,99,235,.30);
+  }
+  .hero h1{ font-size:22px; margin:0 0 4px; letter-spacing:-.02em; }
+  .hero p{ margin:0; color:var(--muted); font-size:13.5px; }
+
+  /* Card */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:30px 30px 26px;
+    animation:fade .28s ease;
+    margin-top:22px;
+  }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .kicker{
+    display:inline-block;
+    font-size:11.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:8px;
+  }
+  .card h2{ font-size:19px; margin:0 0 6px; letter-spacing:-.01em; }
+  .card .sub{ margin:0; color:var(--muted); font-size:13.5px; line-height:1.55; }
+
+  /* Step 1 readout */
+  .readout{
+    display:flex; align-items:baseline; justify-content:center;
+    gap:9px; margin:30px 0 6px;
+  }
+  .readout-value{
+    font-size:58px; font-weight:800; line-height:1;
+    letter-spacing:-.045em; transition:color .18s ease;
+    font-variant-numeric:tabular-nums;
+  }
+  .readout-unit{ font-size:15px; font-weight:600; color:var(--muted); }
+
+  /* Slider */
+  .slider-block{ margin-top:18px; }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:26px; background:transparent;
+    margin:0; padding:0; cursor:pointer; display:block;
+  }
+  input[type=range]:focus{ outline:none; }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:10px; border-radius:999px;
+    background:var(--track,#e6ebf3);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:26px; height:26px; margin-top:-8px;
+    border-radius:50%; background:#fff;
+    border:4px solid var(--sev-color,#eab308);
+    box-shadow:0 3px 10px rgba(15,23,42,.22);
+    transition:border-color .18s ease, transform .12s ease;
+  }
+  input[type=range]:active::-webkit-slider-thumb{ transform:scale(1.08); }
+  input[type=range]::-moz-range-track{
+    height:10px; border-radius:999px;
+    background:var(--track,#e6ebf3);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%; background:#fff;
+    border:4px solid var(--sev-color,#eab308);
+    box-shadow:0 3px 10px rgba(15,23,42,.22);
+  }
+
+  .ticks{ position:relative; height:16px; margin:10px 13px 0; }
+  .ticks span{
+    position:absolute; top:0; transform:translateX(-50%);
+    font-size:11px; font-weight:600; color:#94a3b8;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .zonebar-wrap{ position:relative; margin:24px 13px 0; }
+  .zonebar{ display:flex; gap:2px; height:12px; border-radius:999px; overflow:hidden; }
+  .zone{ height:100%; }
+  .zone-marker{
+    position:absolute; top:-5px; height:22px; width:4px;
+    background:#0f172a; border-radius:3px;
+    transform:translateX(-50%);
+    box-shadow:0 0 0 2.5px #fff, 0 2px 6px rgba(15,23,42,.25);
+    transition:left .12s ease; pointer-events:none;
+  }
+  .zone-legend{
+    display:flex; justify-content:space-between;
+    margin:12px 13px 0;
+    font-size:10.5px; font-weight:600; color:#94a3b8;
+  }
+
+  .status-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px; flex-wrap:wrap;
+    margin-top:26px; padding-top:22px;
+    border-top:1px solid var(--line);
+  }
+
+  .badge{
+    display:inline-flex; align-items:center; gap:9px;
+    padding:9px 17px; border-radius:999px;
+    font-size:13.5px; font-weight:700;
+    transition:background .18s ease, color .18s ease;
+  }
+  .badge .dotb{
+    width:9px; height:9px; border-radius:50%;
+    background:currentColor; flex:none;
+    box-shadow:0 0 0 3px currentColor;
+    opacity:.9;
+  }
+
+  .ref-inline{ font-size:12.5px; color:var(--muted); }
+  .ref-inline strong{ color:var(--ink-2); font-weight:700; }
+
+  .hint{ margin-top:14px; font-size:13px; color:var(--muted); line-height:1.6; }
+
+  .ref-title{
+    margin:26px 0 10px;
+    font-size:11.5px; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:#94a3b8;
+  }
+  .ref-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+    gap:9px;
+  }
+  .ref-item{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fbfcfe;
+  }
+  .ref-item .sw{ width:9px; height:26px; border-radius:4px; flex:none; }
+  .ref-item b{ display:block; font-size:12.5px; font-weight:700; }
+  .ref-item .r{ display:block; font-size:11.5px; color:var(--muted); margin-top:1px; }
+
+  .result{
+    margin-top:22px; padding:17px 20px;
+    border-radius:14px; border:1px solid;
+    font-size:13.5px; line-height:1.62;
+    animation:fade .25s ease;
+  }
+  .result strong{ display:block; font-size:14.5px; margin-bottom:3px; }
+  .result.ok{ background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+  .result.warn{ background:#eff6ff; border-color:#bfdbfe; color:#1e40af; }
+
+  /* Buttons */
+  .actions{
+    display:flex; gap:10px; justify-content:flex-end;
+    margin-top:28px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    border:1px solid var(--line);
+    background:#fff; color:var(--ink-2);
+    padding:11px 21px; border-radius:12px;
+    font-size:13.5px; font-weight:650;
+    cursor:pointer;
+    transition:background .15s ease, box-shadow .15s ease, filter .15s ease, transform .08s ease;
+  }
+  .btn:hover{ background:#f8fafc; }
+  .btn:active{ transform:translateY(1px); }
+  .btn.primary{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff; border-color:transparent;
+    box-shadow:0 8px 18px rgba(37,99,235,.26);
+  }
+  .btn.primary:hover{ filter:brightness(1.07); background:linear-gradient(135deg,#2563eb,#1d4ed8); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; filter:grayscale(.35); }
+  .btn:disabled:hover{ background:#fff; }
+  .btn.primary:disabled:hover{ background:linear-gradient(135deg,#2563eb,#1d4ed8); }
+
+  /* Summary */
+  .summary{
+    margin-top:22px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px 24px;
+    background:#fbfcfe;
+  }
+  .summary h3{
+    font-size:11.5px; font-weight:800; letter-spacing:.08em;
+    text-transform:uppercase; color:#94a3b8;
+    margin:0 0 10px;
+  }
+  .summary .group + h3{ margin-top:22px; }
+  .srow{
+    display:flex; justify-content:space-between; gap:18px;
+    padding:9px 0;
+    font-size:13.5px;
+    border-bottom:1px dashed #e8eef7;
+  }
+  .srow:last-child{ border-bottom:none; }
+  .srow .k{ color:var(--muted); flex:none; }
+  .srow .v{ font-weight:650; text-align:right; }
+
+  /* Step 2 clinical */
+  .recap{
+    display:flex; flex-wrap:wrap; gap:10px 26px;
+    margin-top:20px;
+    padding:14px 18px;
+    border-radius:14px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+    font-size:13px;
+  }
+  .recap .item{ display:flex; gap:7px; align-items:baseline; }
+  .recap .item span:first-child{ color:var(--muted); }
+  .recap .item strong{ font-weight:700; }
+
+  .symptom-block{ margin-top:24px; }
+  .symptom-head{
+    display:flex; align-items:center; gap:9px;
+    font-size:11.5px; font-weight:800; letter-spacing:.07em;
+    text-transform:uppercase; color:#94a3b8;
+    margin-bottom:11px;
+  }
+  .symptom-head.critical-head{ color:#b91c1c; }
+  .sym-dot{
+    width:8px; height:8px; border-radius:50%;
+    background:#cbd5e1; flex:none;
+  }
+  .sym-dot.critical{
+    background:#ef4444;
+    box-shadow:0 0 0 3px rgba(239,68,68,.16);
+  }
+
+  .checkbox-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:8px;
+  }
+
+  .check-item{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fbfcfe;
+    cursor:pointer;
+    font-size:13px;
+    line-height:1.45;
+    color:var(--ink-2);
+    transition:border-color .15s ease, background .15s ease;
+    user-select:none;
+  }
+  .check-item:hover{ border-color:#cbd5e1; background:#f8fafc; }
+  .check-item input{
+    width:16px; height:16px; margin-top:2px; flex:none;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .check-item.checked{ border-color:var(--accent); background:#eff6ff; }
+  .check-item.critical.checked{ border-color:#ef4444; background:#fef2f2; }
+
+  .emergency{
+    margin-top:24px;
+    border:1px solid #fecaca;
+    background:#fef2f2;
+    border-radius:16px;
+    padding:20px 22px 22px;
+    animation:fade .25s ease;
+  }
+  .emergency h3{
+    margin:0 0 6px;
+    font-size:15px; font-weight:800;
+    color:#b91c1c;
+    display:flex; align-items:center; gap:9px;
+  }
+  .emergency h3 .pulse{
+    width:10px; height:10px; border-radius:50%;
+    background:#ef4444; flex:none;
+    box-shadow:0 0 0 0 rgba(239,68,68,.6);
+    animation:pulse 1.8s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(239,68,68,.55); }
+    70%{ box-shadow:0 0 0 9px rgba(239,68,68,0); }
+    100%{ box-shadow:0 0 0 0 rgba(239,68,68,0); }
+  }
+  .emergency p.lead{ margin:0 0 4px; font-size:13px; color:#7f1d1d; line-height:1.6; }
+  .emergency ul{ margin:10px 0 0; padding-left:20px; }
+  .emergency li{ font-size:13px; line-height:1.68; color:#7f1d1d; margin-bottom:4px; }
+  .emergency li b{ color:#991b1b; }
+
+  .emergency-confirm{
+    display:flex; align-items:flex-start; gap:11px;
+    margin-top:18px;
+    padding:13px 15px;
+    background:#fff;
+    border:1px solid #fecaca;
+    border-radius:12px;
+    font-size:13px;
+    line-height:1.55;
+    color:#7f1d1d;
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .emergency-confirm:hover{ border-color:#fca5a5; }
+  .emergency-confirm.checked{ border-color:#ef4444; background:#fff5f5; }
+  .emergency-confirm input{
+    width:17px; height:17px; margin-top:1px; flex:none;
+    accent-color:#dc2626; cursor:pointer;
+  }
+
+  .stable-box{
+    margin-top:24px;
+    border:1px solid #bbf7d0;
+    background:#f0fdf4;
+    border-radius:16px;
+    padding:17px 20px;
+    color:#166534;
+    font-size:13.5px;
+    line-height:1.62;
+    animation:fade .25s ease;
+  }
+  .stable-box strong{ display:block; font-size:14.5px; margin-bottom:3px; color:#166534; }
+
+  /* Step 3 calculator */
+  .test-card{
+    margin-top:22px;
+    padding:22px 24px 20px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:#f8fafc;
+    font-size:13.5px; line-height:1.65; color:var(--ink-2);
+  }
+  .test-card .test-label{
+    font-size:11.5px; font-weight:800; letter-spacing:.07em;
+    text-transform:uppercase; color:var(--accent);
+    margin-bottom:8px;
+  }
+  .test-card p.intro{
+    margin:0 0 16px;
+    font-size:13px;
+    color:var(--ink-2);
+    line-height:1.6;
+  }
+  .test-card p.intro b{ color:var(--ink); }
+
+  .calc-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:11px;
+  }
+  @media (max-width:560px){ .calc-grid{ grid-template-columns:1fr; } }
+
+  .calc-field label{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:8px;
+    font-size:11.5px; font-weight:700;
+    color:var(--ink-2);
+    margin-bottom:5px; letter-spacing:.02em;
+  }
+  .calc-field label .from-step{
+    font-weight:500; color:#94a3b8; font-size:10px;
+    letter-spacing:.04em; text-transform:uppercase;
+  }
+  .calc-field input{
+    width:100%;
+    padding:11px 13px;
+    border:1.5px solid var(--line);
+    border-radius:11px;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink);
+    background:#fff;
+    transition:border-color .15s ease, box-shadow .15s ease;
+    font-variant-numeric:tabular-nums;
+  }
+  .calc-field input:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  }
+  .calc-field input:disabled{
+    background:#eef2f8;
+    color:var(--ink-2);
+    cursor:not-allowed;
+    font-weight:800;
+  }
+
+  .calc-pending{
+    margin:16px 0 0;
+    padding:14px 16px;
+    border-radius:12px;
+    background:#fff;
+    border:1px dashed #dbe3ee;
+    font-size:12.5px; color:var(--muted);
+    line-height:1.55;
+    display:flex; align-items:center; gap:10px;
+  }
+  .calc-pending .pend-dot{
+    width:8px; height:8px; border-radius:50%;
+    background:#cbd5e1; flex:none;
+    animation:blink 1.6s infinite;
+  }
+  @keyframes blink{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+
+  .calc-results{
+    margin-top:18px;
+    padding:18px 20px;
+    border-radius:14px;
+    background:#fff;
+    border:1px solid var(--line);
+    display:none;
+    animation:fade .22s ease;
+  }
+  .calc-results.show{ display:block; }
+
+  .calc-metrics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:11px;
+    margin-bottom:14px;
+  }
+  .calc-metric{
+    text-align:center;
+    padding:12px 8px;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px solid var(--line);
+  }
+  .calc-metric .val{
+    font-size:24px; font-weight:800;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em; line-height:1.1;
+  }
+  .calc-metric .unit{
+    font-size:12px; font-weight:600;
+    color:var(--muted); margin-left:2px;
+  }
+  .calc-metric .lbl{
+    font-size:10.5px; font-weight:800;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-top:5px;
+  }
+
+  .calc-verdict{
+    padding:12px 16px;
+    border-radius:12px;
+    font-size:13px; line-height:1.55; font-weight:700;
+    display:flex; align-items:center; gap:10px;
+  }
+  .calc-verdict.renal{ background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+  .calc-verdict.nonrenal{ background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
+  .calc-verdict .verdict-dot{
+    width:9px; height:9px; border-radius:50%;
+    background:currentColor; flex:none;
+    box-shadow:0 0 0 3px currentColor;
+    opacity:.9;
+  }
+
+  .calc-hint{
+    margin-top:10px;
+    font-size:11.5px; color:var(--muted); line-height:1.55;
+  }
+
+  .calc-cutoff{
+    margin:16px 0 0;
+    padding-top:14px;
+    border-top:1px dashed #dbe3ee;
+    font-size:11.5px; color:var(--muted); line-height:1.6;
+  }
+  .calc-cutoff b{ color:var(--ink-2); }
+
+  .ddx-panel{
+    margin-top:20px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    overflow:hidden;
+    animation:fade .25s ease;
+  }
+  .ddx-header{
+    padding:15px 20px;
+    font-size:14px; font-weight:750;
+    display:flex; align-items:center; gap:10px;
+  }
+  .ddx-header.renal{ background:#fef2f2; color:#b91c1c; border-bottom:1px solid #fecaca; }
+  .ddx-header.nonrenal{ background:#f0fdf4; color:#15803d; border-bottom:1px solid #bbf7d0; }
+  .ddx-body{
+    padding:14px 20px 18px;
+    background:#fff;
+    font-size:13px; line-height:1.6; color:var(--ink-2);
+  }
+  .ddx-body .ddx-note{
+    font-size:12px; color:var(--muted);
+    margin:0 0 10px;
+  }
+  .ddx-list{
+    list-style:none; margin:0; padding:0;
+    display:grid; grid-template-columns:1fr 1fr; gap:0 22px;
+  }
+  @media (max-width:600px){ .ddx-list{ grid-template-columns:1fr; } }
+  .ddx-list li{
+    position:relative;
+    padding:7px 0 7px 18px;
+    border-bottom:1px dashed #eef2f8;
+    font-size:12.8px; line-height:1.5;
+  }
+  .ddx-list li::before{
+    content:"";
+    position:absolute; left:0; top:13px;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent);
+    opacity:.55;
+  }
+  .ddx-list li.key::before{ background:#ef4444; opacity:.85; }
+
+  /* Step 4 branch banner */
+  .branch-banner{
+    display:flex; align-items:center; gap:12px;
+    margin-top:20px;
+    padding:14px 20px;
+    border-radius:14px;
+    font-size:13.5px; font-weight:700;
+    animation:fade .25s ease;
+  }
+  .branch-banner.renal{
+    background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;
+  }
+  .branch-banner.nonrenal{
+    background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;
+  }
+  .branch-banner .b-dot{
+    width:10px; height:10px; border-radius:50%;
+    background:currentColor; flex:none;
+    box-shadow:0 0 0 3px currentColor;
+    opacity:.9;
+  }
+
+  .workup-block{ margin-top:26px; }
+  .workup-head{
+    display:flex; align-items:center; gap:9px;
+    font-size:11.5px; font-weight:800; letter-spacing:.07em;
+    text-transform:uppercase; color:#94a3b8;
+    margin-bottom:11px;
+  }
+  .workup-head .w-dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent); flex:none;
+  }
+
+  /* Radio groups (Step 4) */
+  .radio-group{
+    margin-bottom:12px;
+    padding:14px 16px 15px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#fbfcfe;
+  }
+  .radio-group-label{
+    font-size:11.5px;
+    font-weight:800;
+    color:var(--ink-2);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-bottom:10px;
+  }
+  .radio-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:8px;
+  }
+
+  .radio-item{
+    display:flex; align-items:center; gap:10px;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    cursor:pointer;
+    font-size:13px;
+    color:var(--ink-2);
+    transition:all .15s;
+    user-select:none;
+  }
+  .radio-item:hover{ border-color:#cbd5e1; background:#f8fafc; }
+  .radio-item input{
+    width:16px; height:16px; margin:0; flex:none;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .radio-item.checked{
+    border-color:var(--accent);
+    background:#eff6ff;
+    font-weight:650;
+    color:var(--ink);
+  }
+
+  .narrowed-panel{
+    margin-top:24px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    overflow:hidden;
+    animation:fade .25s ease;
+  }
+  .narrowed-header{
+    padding:14px 20px;
+    font-size:13.5px; font-weight:750;
+    background:#f8fafc;
+    color:var(--ink);
+    border-bottom:1px solid var(--line);
+  }
+  .narrowed-body{
+    padding:14px 20px 18px;
+    background:#fff;
+    font-size:13px; line-height:1.65; color:var(--ink-2);
+  }
+  .narrowed-list{
+    list-style:none; margin:0; padding:0;
+    display:grid; grid-template-columns:1fr 1fr; gap:0 22px;
+  }
+  @media (max-width:600px){ .narrowed-list{ grid-template-columns:1fr; } }
+  .narrowed-list li{
+    position:relative;
+    padding:8px 0 8px 18px;
+    border-bottom:1px dashed #eef2f8;
+    font-size:12.8px; line-height:1.5;
+  }
+  .narrowed-list li::before{
+    content:"";
+    position:absolute; left:0; top:14px;
+    width:6px; height:6px; border-radius:50%;
+    background:#2563eb;
+    opacity:.6;
+  }
+  .narrowed-list li.top{ font-weight:700; color:var(--ink); }
+  .narrowed-list li.top::before{ background:#ef4444; opacity:.85; }
+
+  .empty-narrowed{
+    margin-top:20px;
+    padding:18px 20px;
+    border-radius:14px;
+    background:#fbfcfe;
+    border:1px dashed #dbe3ee;
+    font-size:12.5px; color:var(--muted); line-height:1.55;
+  }
+
+  /* ============================================================
+     STEP 5 — Treatment
+     ============================================================ */
+  .treatment-banner{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+    margin-top:22px;
+    padding:16px 20px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:#f8fafc;
+  }
+  .treatment-banner .tb-label{
+    font-size:11px; font-weight:800; letter-spacing:.07em;
+    text-transform:uppercase; color:var(--muted);
+    margin-bottom:3px;
+  }
+  .treatment-banner .tb-value{
+    font-size:28px; font-weight:800;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em; line-height:1;
+  }
+  .treatment-banner .tb-value span{
+    font-size:13px; font-weight:600; color:var(--muted);
+  }
+  .treatment-banner .tb-right{ text-align:right; }
+  .treatment-banner .tb-tag{
+    display:inline-block;
+    font-size:11.5px; font-weight:800; letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:5px 12px; border-radius:999px;
+    border:1px solid;
+    margin-bottom:4px;
+  }
+  .treatment-banner .tb-sub{
+    font-size:11.5px; color:var(--muted); line-height:1.4;
+  }
+
+  .tx-section{
+    margin-top:24px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .tx-section-head{
+    padding:13px 20px;
+    background:#f8fafc;
+    border-bottom:1px solid var(--line);
+    font-size:12px; font-weight:800;
+    letter-spacing:.05em; text-transform:uppercase;
+    color:var(--ink-2);
+  }
+  .tx-body{
+    padding:16px 20px 18px;
+    background:#fff;
+    font-size:13px;
+    line-height:1.68;
+    color:var(--ink-2);
+  }
+
+  .tx-alert{
+    padding:12px 16px;
+    border-radius:12px;
+    font-size:13px;
+    line-height:1.55;
+    margin-bottom:12px;
+    border:1px solid;
+  }
+  .tx-alert.severe{ background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+  .tx-alert.moderate{ background:#fff7ed; border-color:#fed7aa; color:#9a3412; }
+  .tx-alert.mild{ background:#fefce8; border-color:#fef08a; color:#a16207; }
+  .tx-alert b{ font-weight:800; }
+
+  .tx-ul{ margin:0; padding-left:20px; }
+  .tx-ul li{ margin-bottom:6px; line-height:1.6; }
+  .tx-ul li:last-child{ margin-bottom:0; }
+
+  .tx-cause-list{ display:flex; flex-direction:column; gap:10px; }
+  .tx-cause-item{
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:#fbfcfe;
+  }
+  .tx-cause-title{
+    font-size:13px; font-weight:750;
+    color:var(--ink);
+    margin-bottom:4px;
+  }
+  .tx-cause-body{
+    font-size:12.5px; line-height:1.6; color:var(--ink-2);
+  }
+  .tx-empty{ margin:0; font-size:13px; color:var(--muted); }
+
+  /* Oral dosing + formulations */
+  .tx-dosing-box{
+    margin-top:14px;
+    padding:14px 16px;
+    border-radius:12px;
+    border:1px solid #dbeafe;
+    background:#eff6ff;
+  }
+  .tx-dosing-box .db-title{
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:#1d4ed8;
+    margin-bottom:8px;
+  }
+  .tx-dosing-box ul.tx-ul li{ color:#1e3a8a; }
+  .tx-dosing-box ul.tx-ul li b{ color:#1e40af; }
+
+  .formulation-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+    font-size:12.5px;
+  }
+  .formulation-table th,
+  .formulation-table td{
+    padding:8px 10px;
+    text-align:left;
+    border-bottom:1px solid #e2e8f0;
+    vertical-align:top;
+    line-height:1.5;
+  }
+  .formulation-table th{
+    background:#f1f5f9;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--ink-2);
+  }
+  .formulation-table tr:last-child td{ border-bottom:none; }
+  .formulation-table td.brand{ font-weight:700; color:var(--ink); }
+  .formulation-table td.elem{ font-weight:700; color:#1d4ed8; }
+
+  /* Toast */
+  .toast{
+    position:fixed; left:50%; bottom:30px;
+    transform:translate(-50%,16px);
+    background:#0f172a; color:#fff;
+    padding:11px 22px; border-radius:12px;
+    font-size:13px; font-weight:600;
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    box-shadow:0 12px 28px rgba(15,23,42,.28);
+    z-index:99;
+  }
+  .toast.show{ opacity:1; transform:translate(-50%,0); }
+
+  @media (max-width:640px){
+    body{ padding:24px 12px 60px; }
+    .card{ padding:24px 20px 22px; }
+    .readout-value{ font-size:46px; }
+    .hero h1{ font-size:19px; }
+    .checkbox-grid{ grid-template-columns:1fr; }
+    .formulation-table{ font-size:11.5px; }
+    .formulation-table th,
+    .formulation-table td{ padding:6px 7px; }
+  }
+
+  @media print{
+    body{ background:#fff; padding:0; }
+    .hero, .actions, .toast, .no-print{ display:none !important; }
+    .card{ box-shadow:none; border:none; padding:0; }
+    .summary{ background:#fff; border:1px solid #cbd5e1; }
+    .srow{ border-bottom-color:#e2e8f0; }
+    .ddx-panel, .narrowed-panel, .tx-section{ break-inside:avoid; }
+    .formulation-table{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-badge">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 2.5h6"/>
+        <path d="M10 2.5v6L5.6 16.2A3.9 3.9 0 0 0 9 21.5h6a3.9 3.9 0 0 0 3.4-5.3L14 8.5v-6"/>
+        <path d="M7.4 14.6h9.2"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Hypophosphatemia Wizard</h1>
+      <p>Interactive, step-by-step evaluation of the cause and management of hypophosphatemia</p>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ================= STEP 1 ================= -->
+    <section class="card panel" id="panel-1">
+      <span class="kicker">1 · Phosphorus</span>
+      <h2>Serum Phosphorus Level</h2>
+      <p class="sub">Drag the slider to enter the patient's serum phosphorus concentration. The severity is calculated live as you move it.</p>
+
+      <div class="readout">
+        <span class="readout-value" id="bigValue">1.8</span>
+        <span class="readout-unit">mg/dL</span>
+      </div>
+
+      <div class="slider-block">
+        <input type="range" id="phosSlider" min="0.3" max="6" step="0.1" value="1.8"
+               aria-label="Serum phosphorus in mg/dL">
+        <div class="ticks" id="ticks"></div>
+      </div>
+
+      <div class="zonebar-wrap">
+        <div class="zonebar" id="zonebar"></div>
+        <div class="zone-marker" id="zoneMarker"></div>
+      </div>
+      <div class="zone-legend">
+        <span>Severe</span><span>Moderate</span><span>Mild</span><span>Normal</span><span>High</span>
+      </div>
+
+      <div class="status-row">
+        <div class="badge" id="sevBadge">
+          <span class="dotb"></span>
+          <span id="sevText">—</span>
+        </div>
+        <div class="ref-inline">Reference range: <strong>2.5 – 4.5 mg/dL</strong></div>
+      </div>
+
+      <p class="hint" id="sevHint"></p>
+
+      <div class="ref-title">Severity classification</div>
+      <div class="ref-grid" id="refGrid"></div>
+
+      <div class="result hidden" id="resultBox"></div>
+
+      <div class="actions">
+        <button class="btn ghost" id="resetBtn">Reset</button>
+        <button class="btn primary" id="continueBtn">Continue →</button>
+      </div>
+    </section>
+
+    <!-- ================= STEP 2 — CLINICAL ================= -->
+    <section class="card panel hidden" id="panel-2">
+      <span class="kicker">2 · Clinical</span>
+      <h2>Clinical Assessment</h2>
+      <p class="sub">Select all signs and symptoms present. Severe or critical findings require emergency management.</p>
+
+      <div class="recap" id="clinicalRecap"></div>
+
+      <div class="symptom-block">
+        <div class="symptom-head critical-head">
+          <span class="sym-dot critical"></span>
+          Severe / critical findings
+        </div>
+        <div class="checkbox-grid" id="criticalSymptoms"></div>
+      </div>
+
+      <div class="symptom-block">
+        <div class="symptom-head">
+          <span class="sym-dot"></span>
+          Mild / moderate findings
+        </div>
+        <div class="checkbox-grid" id="mildSymptoms"></div>
+      </div>
+
+      <div id="emergencyBox" class="emergency hidden">
+        <h3><span class="pulse"></span>Emergency Management Recommended</h3>
+        <p class="lead">The patient meets criteria for severe or critical hypophosphatemia. Immediate hospital-based management is indicated.</p>
+        <ul>
+          <li>Admit the patient to hospital (consider ICU / telemetry).</li>
+          <li>Obtain a 12-lead ECG and initiate continuous cardiac monitoring.</li>
+          <li>Start <b>intravenous phosphorus</b> replacement (e.g., sodium phosphate) per local protocol.</li>
+          <li>Monitor serum phosphorus, calcium, magnesium and potassium serially.</li>
+          <li>Watch closely for arrhythmias, respiratory muscle weakness, rhabdomyolysis and hemolysis.</li>
+          <li>Treat the underlying cause; consider critical care / nephrology consultation.</li>
+          <li><b>Caution:</b> rapid IV phosphorus can cause hypocalcemia, hypotension and metastatic calcification — infuse slowly and recheck levels.</li>
+        </ul>
+        <label class="emergency-confirm" id="confirmWrap">
+          <input type="checkbox" id="emergencyConfirm">
+          <span>I confirm that emergency management has been initiated (hospital admission and IV phosphorus therapy) before proceeding to etiology.</span>
+        </label>
+      </div>
+
+      <div id="stableBox" class="stable-box hidden">
+        <strong>Patient is clinically stable</strong>
+        No severe or critical findings are present. Proceed to determine the underlying cause of hypophosphatemia.
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" data-goto="1">← Back</button>
+        <button class="btn primary" id="step2Continue" disabled>Continue to etiology →</button>
+      </div>
+    </section>
+
+    <!-- ================= STEP 3 — ETIOLOGY ================= -->
+    <section class="card panel hidden" id="panel-3">
+      <span class="kicker">3 · Etiology</span>
+      <h2>Etiology — Renal vs Non‑Renal</h2>
+      <p class="sub">The key discriminator is urinary phosphate excretion. Fill in the four values below — as soon as all are entered, FePO₄ and TmP/GFR are calculated live, the etiology branch is determined, and the matching differential diagnosis appears.</p>
+
+      <div class="test-card">
+        <div class="test-label">Phosphate Excretion Calculator</div>
+        <p class="intro">
+          <b>FePO₄</b> is calculated from a fasting serum phosphate with a simultaneous spot urine phosphate and creatinine.
+          <b>TmP/GFR</b> is derived from the same samples and is considered the reference method.
+        </p>
+
+        <div class="calc-grid">
+          <div class="calc-field">
+            <label>Serum phosphorus (mg/dL) <span class="from-step">from Step 1</span></label>
+            <input type="number" id="calcSerumP" step="0.1" min="0.1" disabled>
+          </div>
+          <div class="calc-field">
+            <label>Urine phosphorus (mg/dL)</label>
+            <input type="number" id="calcUrineP" step="0.1" min="0" placeholder="e.g., 15">
+          </div>
+          <div class="calc-field">
+            <label>Serum creatinine (mg/dL)</label>
+            <input type="number" id="calcSerumCr" step="0.01" min="0.01" placeholder="e.g., 1.0">
+          </div>
+          <div class="calc-field">
+            <label>Urine creatinine (mg/dL)</label>
+            <input type="number" id="calcUrineCr" step="1" min="0" placeholder="e.g., 100">
+          </div>
+        </div>
+
+        <p class="calc-pending" id="calcPending">
+          <span class="pend-dot"></span>
+          Enter all four values to calculate FePO₄ and TmP/GFR and determine the etiology branch.
+        </p>
+
+        <div class="calc-results" id="calcResults"></div>
+
+        <p class="calc-cutoff">
+          <b>Cutoff:</b> FePO₄ ≥ 5 % (or a low TmP/GFR) indicates renal phosphate wasting. FePO₄ &lt; 5 % indicates a non‑renal cause.
+        </p>
+      </div>
+
+      <div id="ddxPanel" class="ddx-panel hidden"></div>
+
+      <div class="actions">
+        <button class="btn ghost" data-goto="2">← Back</button>
+        <button class="btn primary" id="step3Continue" disabled>Continue to workup →</button>
+      </div>
+    </section>
+
+    <!-- ================= STEP 4 — WORKUP ================= -->
+    <section class="card panel hidden" id="panel-4">
+      <span class="kicker">4 · Workup</span>
+      <h2 id="workupTitle">Next Step — Targeted Workup</h2>
+      <p class="sub" id="workupSub">Answer the relevant follow-up questions to narrow the differential diagnosis.</p>
+
+      <div id="branchBanner" class="branch-banner hidden"></div>
+
+      <div id="renalWorkup" class="hidden">
+        <div class="workup-block">
+          <div class="workup-head">
+            <span class="w-dot"></span>
+            Key differentiating tests — Renal phosphate wasting
+          </div>
+          <div id="renalRadioGroups"></div>
+        </div>
+
+        <div class="workup-block">
+          <div class="workup-head">
+            <span class="w-dot"></span>
+            Fanconi syndrome features
+          </div>
+          <div class="checkbox-grid" id="fanconiFeatures"></div>
+        </div>
+
+        <div id="renalNarrowed" class="narrowed-panel hidden">
+          <div class="narrowed-header">Narrowed differential — renal</div>
+          <div class="narrowed-body" id="renalNarrowedBody"></div>
+        </div>
+      </div>
+
+      <div id="nonrenalWorkup" class="hidden">
+        <div class="workup-block">
+          <div class="workup-head">
+            <span class="w-dot"></span>
+            Key differentiating features — Non‑renal causes
+          </div>
+          <div class="checkbox-grid" id="nonrenalTests"></div>
+        </div>
+
+        <div id="nonrenalNarrowed" class="narrowed-panel hidden">
+          <div class="narrowed-header">Narrowed differential — non‑renal</div>
+          <div class="narrowed-body" id="nonrenalNarrowedBody"></div>
+        </div>
+      </div>
+
+      <div id="emptyNarrowed" class="empty-narrowed hidden">
+        Select at least one finding above to see the narrowed differential diagnosis.
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" data-goto="3">← Back</button>
+        <button class="btn primary" id="step4Continue" disabled>Continue to treatment →</button>
+      </div>
+    </section>
+
+    <!-- ================= STEP 5 — TREATMENT ================= -->
+    <section class="card panel hidden" id="panel-5">
+      <span class="kicker">5 · Treatment</span>
+      <h2>Treatment Plan</h2>
+      <p class="sub">Recommendations are generated automatically from the initial phosphorus level and the specific etiology identified.</p>
+
+      <div id="treatmentBanner" class="treatment-banner"></div>
+
+      <div class="tx-section">
+        <div class="tx-section-head">1 · Phosphorus Replacement</div>
+        <div class="tx-body" id="txReplacement"></div>
+      </div>
+
+      <div class="tx-section">
+        <div class="tx-section-head">2 · Cause-Specific Management</div>
+        <div class="tx-body" id="txCause"></div>
+      </div>
+
+      <div class="tx-section">
+        <div class="tx-section-head">3 · Monitoring</div>
+        <div class="tx-body" id="txMonitoring"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost" data-goto="4">← Back</button>
+        <button class="btn primary" id="step5Continue">Continue to summary →</button>
+      </div>
+    </section>
+
+    <!-- ================= STEP 6 — SUMMARY ================= -->
+    <section class="card panel hidden" id="panel-6">
+      <span class="kicker">6 · Summary</span>
+      <h2>Summary</h2>
+      <p class="sub">Review, copy or print the assessment collected so far.</p>
+
+      <div class="summary" id="summaryContent"></div>
+
+      <div class="actions no-print">
+        <button class="btn ghost" data-goto="5">← Back</button>
+        <button class="btn" id="copyBtn">Copy</button>
+        <button class="btn primary" id="printBtn">Print</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+/* =========================================================
+   1. DATA
+   ========================================================= */
+const MIN = 0.3;
+const MAX = 6.0;
+
+const ZONES = [
+  { key:'severe',   from:0.3, to:1.0, name:'Severe Hypophosphatemia',   short:'Severe',
+    color:'#ef4444', bg:'#fef2f2', text:'#b91c1c', range:'< 1.0 mg/dL' },
+  { key:'moderate', from:1.0, to:2.0, name:'Moderate Hypophosphatemia', short:'Moderate',
+    color:'#f97316', bg:'#fff7ed', text:'#c2410c', range:'1.0 – 1.9 mg/dL' },
+  { key:'mild',     from:2.0, to:2.5, name:'Mild Hypophosphatemia',     short:'Mild',
+    color:'#eab308', bg:'#fefce8', text:'#a16207', range:'2.0 – 2.4 mg/dL' },
+  { key:'normal',   from:2.5, to:4.5, name:'Normal',                    short:'Normal',
+    color:'#22c55e', bg:'#f0fdf4', text:'#15803d', range:'2.5 – 4.5 mg/dL' },
+  { key:'high',     from:4.5, to:6.0, name:'Hyperphosphatemia',         short:'High',
+    color:'#3b82f6', bg:'#eff6ff', text:'#1d4ed8', range:'> 4.5 mg/dL' }
+];
+
+const HINTS = {
+  severe:   'Phosphorus is markedly reduced. Severe hypophosphatemia is present.',
+  moderate: 'Phosphorus is below the reference range. Moderate hypophosphatemia is present.',
+  mild:     'Phosphorus is slightly below the reference range. Mild hypophosphatemia is present.',
+  normal:   'Phosphorus is within the normal reference range.',
+  high:     'Phosphorus is above the reference range — this is hyperphosphatemia, not hypophosphatemia.'
+};
+
+const CRITICAL_SYMPTOMS = [
+  { id:'resp_failure',    label:'Respiratory failure / respiratory muscle weakness' },
+  { id:'cardiac_failure', label:'Heart failure / cardiac decompensation' },
+  { id:'arrhythmia',      label:'Arrhythmia / palpitations with instability' },
+  { id:'ecg_changes',     label:'ECG changes (ST depression, prolonged QT, U waves)' },
+  { id:'seizures',        label:'Seizures' },
+  { id:'ams',             label:'Altered mental status / confusion / coma' },
+  { id:'rhabdo',          label:'Rhabdomyolysis' },
+  { id:'hemolysis',       label:'Hemolytic anemia' }
+];
+
+const MILD_SYMPTOMS = [
+  { id:'weakness',    label:'Generalized muscle weakness' },
+  { id:'fatigue',     label:'Fatigue / malaise' },
+  { id:'bone_pain',   label:'Bone pain' },
+  { id:'myalgia',     label:'Muscle pain / myalgia' },
+  { id:'paresthesia', label:'Paresthesias' },
+  { id:'anorexia',    label:'Anorexia / nausea' }
+];
+
+const RENAL_DDX = [
+  { text:'Primary hyperparathyroidism', key:true },
+  { text:'Secondary hyperparathyroidism (vitamin D deficiency, CKD)' },
+  { text:'FGF23-mediated — tumor-induced osteomalacia, XLH, ADHR, ARHR', key:true },
+  { text:'Fanconi syndrome' },
+  { text:'Drug-induced (tenofovir, ifosfamide, cisplatin, acetazolamide)' },
+  { text:'Intrinsic tubular disorders (RTA, post-ATN)' }
+];
+
+const NONRENAL_DDX = [
+  { text:'Inadequate intake / malnutrition / alcohol use', key:true },
+  { text:'Decreased absorption (malabsorption, bariatric surgery, vitamin D deficiency)', key:true },
+  { text:'Phosphate binders (aluminum, calcium-based antacids)' },
+  { text:'Redistribution — respiratory alkalosis, refeeding, DKA recovery, insulin, β-agonists', key:true },
+  { text:'Hungry bone syndrome (post-parathyroidectomy / thyroidectomy)' },
+  { text:'Rapid cell turnover (leukemia, lymphoma)' }
+];
+
+const RENAL_RADIO_GROUPS = [
+  {
+    id: 'pth',
+    title: 'PTH',
+    options: [
+      { id: 'pth_high',       label: 'Elevated' },
+      { id: 'pth_normal_low', label: 'Normal or low' }
+    ]
+  },
+  {
+    id: 'fgf23',
+    title: 'FGF23 (intact)',
+    options: [
+      { id: 'fgf23_high',   label: 'Elevated (> ~27 pg/mL)' },
+      { id: 'fgf23_normal', label: 'Normal or low' }
+    ]
+  },
+  {
+    id: 'urine_ca',
+    title: 'Urine calcium',
+    options: [
+      { id: 'urine_ca_low',    label: 'Low' },
+      { id: 'urine_ca_normal', label: 'Normal' },
+      { id: 'urine_ca_high',   label: 'High' }
+    ]
+  }
+];
+
+const FANCONI_FEATURES = [
+  { id:'glucosuria',      label:'Glucosuria with normal serum glucose' },
+  { id:'aminoaciduria',   label:'Aminoaciduria' },
+  { id:'phosphaturia',    label:'Phosphaturia (already established)' },
+  { id:'bicarbonaturia',  label:'Bicarbonaturia / proximal RTA' },
+  { id:'lwm_proteinuria', label:'Low-molecular-weight proteinuria' },
+  { id:'uric_acid_wasting', label:'Uric acid wasting' }
+];
+
+const NONRENAL_TESTS = [
+  { id:'poor_intake',    label:'Poor dietary intake / malnutrition / alcohol use' },
+  { id:'gi_symptoms',    label:'Chronic diarrhoea, malabsorption or bariatric surgery' },
+  { id:'vitd_low',       label:'Vitamin D deficiency (low 25-OH vitamin D)' },
+  { id:'antacids',       label:'Antacid / phosphate binder use' },
+  { id:'resp_alkalosis', label:'Respiratory alkalosis / hyperventilation' },
+  { id:'refeeding',      label:'Refeeding syndrome / recent carbohydrate load' },
+  { id:'insulin',        label:'Insulin administration or DKA recovery' },
+  { id:'hungry_bone',    label:'Recent parathyroidectomy / hungry bone syndrome' },
+  { id:'cell_turnover',  label:'Rapid cell turnover (leukaemia / lymphoma)' }
+];
+
+const ORAL_FORMULATIONS = [
+  { brand:'Neutra-Phos® (packet/capsule)',  elem:'250 mg (~8 mmol)',   salt:'Sodium + potassium phosphate', notes:'Dissolve in water/juice; palatable but high sodium load.' },
+  { brand:'Neutra-Phos K® (packet/capsule)', elem:'250 mg (~8 mmol)',  salt:'Potassium phosphate',          notes:'For patients who need to avoid sodium.' },
+  { brand:'K-Phos Neutral® (tablet)',        elem:'250 mg (~8 mmol)',   salt:'Sodium + potassium phosphate', notes:'One tablet 3–4 times daily with meals.' },
+  { brand:'K-Phos® Original (tablet)',       elem:'114 mg (~3.7 mmol)', salt:'Potassium phosphate (sodium-free)', notes:'Primarily used as urinary acidifier; lower elemental P per tablet.' },
+  { brand:'Phospha 250 Neutral® (tablet)',   elem:'250 mg',             salt:'Potassium/sodium phosphate',    notes:'Alternative 250 mg tablet product.' }
+];
+
+/* =========================================================
+   2. STATE
+   ========================================================= */
+const state = {
+  phosphorus: null,
+  zone: null,
+  clinical: {
+    selected: new Set(),
+    emergency: false,
+    emergencyConfirmed: false
+  },
+  etiology: {
+    type: null,
+    calc: null
+  },
+  workup: {
+    renalRadio: { pth: null, fgf23: null, urine_ca: null },
+    fanconi: new Set(),
+    nonrenal: new Set()
+  }
+};
+
+/* =========================================================
+   3. DOM REFERENCES
+   ========================================================= */
+const slider            = document.getElementById('phosSlider');
+const bigValue          = document.getElementById('bigValue');
+const ticksEl           = document.getElementById('ticks');
+const zonebarEl         = document.getElementById('zonebar');
+const markerEl          = document.getElementById('zoneMarker');
+const badgeEl           = document.getElementById('sevBadge');
+const sevTextEl         = document.getElementById('sevText');
+const hintEl            = document.getElementById('sevHint');
+const refGridEl         = document.getElementById('refGrid');
+const resultBox         = document.getElementById('resultBox');
+const continueBtn       = document.getElementById('continueBtn');
+const resetBtn          = document.getElementById('resetBtn');
+
+const clinicalRecap     = document.getElementById('clinicalRecap');
+const criticalContainer = document.getElementById('criticalSymptoms');
+const mildContainer     = document.getElementById('mildSymptoms');
+const emergencyBox      = document.getElementById('emergencyBox');
+const stableBox         = document.getElementById('stableBox');
+const step2Continue     = document.getElementById('step2Continue');
+const emergencyConfirm  = document.getElementById('emergencyConfirm');
+const confirmWrap       = document.getElementById('confirmWrap');
+
+const calcSerumP        = document.getElementById('calcSerumP');
+const calcUrineP        = document.getElementById('calcUrineP');
+const calcSerumCr       = document.getElementById('calcSerumCr');
+const calcUrineCr       = document.getElementById('calcUrineCr');
+const calcResultsEl     = document.getElementById('calcResults');
+const calcPending       = document.getElementById('calcPending');
+const ddxPanel          = document.getElementById('ddxPanel');
+const step3Continue     = document.getElementById('step3Continue');
+
+const workupTitle       = document.getElementById('workupTitle');
+const workupSub         = document.getElementById('workupSub');
+const branchBanner      = document.getElementById('branchBanner');
+const renalWorkup       = document.getElementById('renalWorkup');
+const nonrenalWorkup    = document.getElementById('nonrenalWorkup');
+const renalRadioGroupsEl= document.getElementById('renalRadioGroups');
+const fanconiEl         = document.getElementById('fanconiFeatures');
+const nonrenalTestsEl   = document.getElementById('nonrenalTests');
+const renalNarrowed     = document.getElementById('renalNarrowed');
+const renalNarrowedBody = document.getElementById('renalNarrowedBody');
+const nonrenalNarrowed  = document.getElementById('nonrenalNarrowed');
+const nonrenalNarrowedBody = document.getElementById('nonrenalNarrowedBody');
+const emptyNarrowed     = document.getElementById('emptyNarrowed');
+const step4Continue     = document.getElementById('step4Continue');
+
+const treatmentBanner   = document.getElementById('treatmentBanner');
+const txReplacement     = document.getElementById('txReplacement');
+const txCause           = document.getElementById('txCause');
+const txMonitoring      = document.getElementById('txMonitoring');
+const step5Continue     = document.getElementById('step5Continue');
+
+/* =========================================================
+   4. BUILD STATIC UI (Step 1)
+   ========================================================= */
+[1,2,3,4,5,6].forEach(v => {
+  const s = document.createElement('span');
+  s.textContent = v;
+  s.style.left = ((v - MIN) / (MAX - MIN) * 100) + '%';
+  ticksEl.appendChild(s);
+});
+
+ZONES.forEach(z => {
+  const d = document.createElement('div');
+  d.className = 'zone';
+  d.style.flex = `${(z.to - z.from)} 1 0px`;
+  d.style.background = z.color;
+  zonebarEl.appendChild(d);
+});
+
+ZONES.forEach(z => {
+  const item = document.createElement('div');
+  item.className = 'ref-item';
+  item.innerHTML = `
+    <span class="sw" style="background:${z.color}"></span>
+    <div>
+      <b style="color:${z.text}">${z.short}</b>
+      <span class="r">${z.range}</span>
+    </div>`;
+  refGridEl.appendChild(item);
+});
+
+/* =========================================================
+   5. BUILD CHECKBOXES (Step 2)
+   ========================================================= */
+function buildCheckbox(container, item, critical, stateSet){
+  const label = document.createElement('label');
+  label.className = 'check-item' + (critical ? ' critical' : '');
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.dataset.id = item.id;
+
+  cb.addEventListener('change', () => {
+    label.classList.toggle('checked', cb.checked);
+    if (cb.checked) stateSet.add(item.id);
+    else            stateSet.delete(item.id);
+    if (stateSet === state.clinical.selected) updateStep2();
+  });
+
+  const span = document.createElement('span');
+  span.textContent = item.label;
+
+  label.appendChild(cb);
+  label.appendChild(span);
+  container.appendChild(label);
+}
+
+CRITICAL_SYMPTOMS.forEach(s => buildCheckbox(criticalContainer, s, true, state.clinical.selected));
+MILD_SYMPTOMS.forEach(s => buildCheckbox(mildContainer, s, false, state.clinical.selected));
+
+/* =========================================================
+   6. BUILD WORKUP INPUTS (Step 4)
+   ========================================================= */
+function buildWorkupCheckbox(container, item, stateSet, updateFn){
+  const label = document.createElement('label');
+  label.className = 'check-item';
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.dataset.id = item.id;
+
+  cb.addEventListener('change', () => {
+    label.classList.toggle('checked', cb.checked);
+    if (cb.checked) stateSet.add(item.id);
+    else            stateSet.delete(item.id);
+    updateFn();
+  });
+
+  const span = document.createElement('span');
+  span.textContent = item.label;
+
+  label.appendChild(cb);
+  label.appendChild(span);
+  container.appendChild(label);
+}
+
+FANCONI_FEATURES.forEach(s => buildWorkupCheckbox(fanconiEl, s, state.workup.fanconi, updateStep4));
+NONRENAL_TESTS.forEach(s => buildWorkupCheckbox(nonrenalTestsEl, s, state.workup.nonrenal, updateStep4));
+
+function buildRadioGroup(container, group){
+  const wrap = document.createElement('div');
+  wrap.className = 'radio-group';
+
+  const head = document.createElement('div');
+  head.className = 'radio-group-label';
+  head.textContent = group.title;
+  wrap.appendChild(head);
+
+  const row = document.createElement('div');
+  row.className = 'radio-row';
+
+  group.options.forEach(opt => {
+    const label = document.createElement('label');
+    label.className = 'radio-item';
+
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'rg_' + group.id;
+    radio.value = opt.id;
+
+    radio.addEventListener('change', () => {
+      row.querySelectorAll('.radio-item').forEach(el => {
+        el.classList.toggle('checked', el.querySelector('input').checked);
+      });
+      state.workup.renalRadio[group.id] = radio.checked ? opt.id : null;
+      updateStep4();
+    });
+
+    const span = document.createElement('span');
+    span.textContent = opt.label;
+
+    label.appendChild(radio);
+    label.appendChild(span);
+    row.appendChild(label);
+  });
+
+  wrap.appendChild(row);
+  container.appendChild(wrap);
+}
+
+RENAL_RADIO_GROUPS.forEach(g => buildRadioGroup(renalRadioGroupsEl, g));
+
+/* =========================================================
+   7. HELPERS
+   ========================================================= */
+function zoneFor(v){
+  if (v < 1.0)  return ZONES[0];
+  if (v < 2.0)  return ZONES[1];
+  if (v < 2.5)  return ZONES[2];
+  if (v <= 4.5) return ZONES[3];
+  return ZONES[4];
+}
+
+function hideResult(){
+  resultBox.classList.add('hidden');
+  resultBox.className = 'result hidden';
+  continueBtn.classList.remove('hidden');
+}
+
+function showEndResult(kind, title, text){
+  resultBox.className = 'result ' + kind;
+  resultBox.innerHTML = `<strong>${title}</strong>${text}`;
+  resultBox.classList.remove('hidden');
+  continueBtn.classList.add('hidden');
+}
+
+/* =========================================================
+   8. STEP 1 — LIVE UPDATE
+   ========================================================= */
+function updateLive(){
+  const v = parseFloat(slider.value);
+  const z = zoneFor(v);
+
+  state.phosphorus = v;
+  state.zone = z;
+
+  bigValue.textContent = v.toFixed(1);
+  bigValue.style.color = z.color;
+
+  const pct = (v - MIN) / (MAX - MIN) * 100;
+  slider.style.setProperty('--sev-color', z.color);
+  slider.style.setProperty(
+    '--track',
+    `linear-gradient(to right, ${z.color} 0 ${pct}%, #e6ebf3 ${pct}% 100%)`
+  );
+
+  markerEl.style.left = pct + '%';
+
+  badgeEl.style.background = z.bg;
+  badgeEl.style.color = z.text;
+  sevTextEl.textContent = z.name + ' · ' + z.range;
+
+  hintEl.textContent = HINTS[z.key];
+
+  calcSerumP.value = v.toFixed(1);
+
+  hideResult();
+  updateStep2();
+  calcExcretion();
+}
+
+/* =========================================================
+   9. STEP 2 — CLINICAL LOGIC
+   ========================================================= */
+function renderRecap(){
+  if (!state.zone) return;
+  clinicalRecap.innerHTML = `
+    <div class="item"><span>Serum phosphorus</span><strong style="color:${state.zone.color}">${state.phosphorus.toFixed(1)} mg/dL</strong></div>
+    <div class="item"><span>Severity</span><strong style="color:${state.zone.text}">${state.zone.name}</strong></div>
+  `;
+}
+
+function updateStep2(){
+  if (!state.phosphorus) return;
+  renderRecap();
+
+  const severeP = state.phosphorus < 1.0;
+  const criticalChecked = CRITICAL_SYMPTOMS.some(s => state.clinical.selected.has(s.id));
+  const emergency = severeP || criticalChecked;
+
+  const prevEmergency = state.clinical.emergency;
+  state.clinical.emergency = emergency;
+
+  if (emergency && !prevEmergency){
+    state.clinical.emergencyConfirmed = false;
+    emergencyConfirm.checked = false;
+    confirmWrap.classList.remove('checked');
+  }
+
+  if (emergency){
+    emergencyBox.classList.remove('hidden');
+    stableBox.classList.add('hidden');
+    step2Continue.disabled = !state.clinical.emergencyConfirmed;
+    step2Continue.textContent = state.clinical.emergencyConfirmed
+      ? 'Emergency actions confirmed → Etiology'
+      : 'Confirm emergency actions to continue →';
+  } else {
+    emergencyBox.classList.add('hidden');
+    stableBox.classList.remove('hidden');
+    step2Continue.disabled = false;
+    step2Continue.textContent = 'Continue to etiology →';
+  }
+}
+
+emergencyConfirm.addEventListener('change', () => {
+  state.clinical.emergencyConfirmed = emergencyConfirm.checked;
+  confirmWrap.classList.toggle('checked', emergencyConfirm.checked);
+  updateStep2();
+});
+
+step2Continue.addEventListener('click', () => {
+  if (step2Continue.disabled) return;
+  goToStep(3);
+});
+
+/* =========================================================
+   10. STEP 3 — LIVE CALCULATOR + ETIOLOGY
+   ========================================================= */
+function calcExcretion(){
+  const sP  = parseFloat(calcSerumP.value);
+  const uP  = parseFloat(calcUrineP.value);
+  const sCr = parseFloat(calcSerumCr.value);
+  const uCr = parseFloat(calcUrineCr.value);
+
+  const complete = [sP, uP, sCr, uCr].every(v => !isNaN(v) && v > 0);
+
+  if (!complete){
+    calcResultsEl.classList.remove('show');
+    calcResultsEl.innerHTML = '';
+    calcPending.classList.remove('hidden');
+    ddxPanel.classList.add('hidden');
+    ddxPanel.innerHTML = '';
+    step3Continue.disabled = true;
+    step3Continue.textContent = 'Enter all values to continue →';
+    state.etiology.type = null;
+    state.etiology.calc = null;
+    return;
+  }
+
+  const fePO4   = (uP * sCr) / (sP * uCr) * 100;
+  const tmPRaw  = sP - (uP * sCr / uCr);
+  const tmPGFR  = Math.max(0, tmPRaw);
+  const isRenal = fePO4 >= 5;
+
+  state.etiology.type = isRenal ? 'renal' : 'nonrenal';
+  state.etiology.calc = { fePO4, tmPGFR, sP, uP, sCr, uCr };
+
+  calcPending.classList.add('hidden');
+
+  const feColor    = isRenal ? '#b91c1c' : '#15803d';
+  const feBg       = isRenal ? '#fef2f2' : '#f0fdf4';
+  const feBorder   = isRenal ? '#fecaca' : '#bbf7d0';
+  const verdictCls = isRenal ? 'renal' : 'nonrenal';
+  const verdictTxt = isRenal ? 'Renal phosphate wasting' : 'Non‑renal cause';
+
+  calcResultsEl.innerHTML = `
+    <div class="calc-metrics">
+      <div class="calc-metric" style="background:${feBg};border-color:${feBorder}">
+        <div class="val" style="color:${feColor}">${fePO4.toFixed(1)}<span class="unit">%</span></div>
+        <div class="lbl">FePO₄</div>
+      </div>
+      <div class="calc-metric">
+        <div class="val" style="color:var(--ink)">${tmPGFR.toFixed(2)}<span class="unit">mg/dL</span></div>
+        <div class="lbl">TmP/GFR</div>
+      </div>
+    </div>
+    <div class="calc-verdict ${verdictCls}">
+      <span class="verdict-dot"></span>
+      <span>${verdictTxt} — FePO₄ ${isRenal ? '≥' : '<'} 5 %</span>
+    </div>
+    <p class="calc-hint">
+      ${isRenal
+        ? 'Inappropriate urinary phosphate loss despite hypophosphatemia — kidneys are not conserving phosphate.'
+        : 'Appropriate renal phosphate conservation — kidneys are responding normally to low serum phosphate.'}
+    </p>
+  `;
+  calcResultsEl.classList.add('show');
+
+  renderDDX(isRenal ? 'renal' : 'nonrenal');
+
+  step3Continue.disabled = false;
+  step3Continue.textContent = 'Continue to workup →';
+}
+
+function renderDDX(type){
+  const isRenal = type === 'renal';
+  const list    = isRenal ? RENAL_DDX : NONRENAL_DDX;
+  const title   = isRenal ? 'Renal phosphate wasting — differential' : 'Non‑renal causes — differential';
+  const note    = isRenal
+    ? 'FePO₄ ≥ 5 % — kidneys are inappropriately wasting phosphate despite hypophosphatemia.'
+    : 'FePO₄ < 5 % — kidneys are conserving phosphate appropriately.';
+
+  const cls = isRenal ? 'renal' : 'nonrenal';
+
+  let listHtml = '<ul class="ddx-list">';
+  list.forEach(item => {
+    listHtml += `<li class="${item.key ? 'key' : ''}">${item.text}</li>`;
+  });
+  listHtml += '</ul>';
+
+  ddxPanel.className = 'ddx-panel';
+  ddxPanel.innerHTML = `
+    <div class="ddx-header ${cls}">${title}</div>
+    <div class="ddx-body">
+      <p class="ddx-note">${note}</p>
+      ${listHtml}
+    </div>
+  `;
+}
+
+[calcUrineP, calcSerumCr, calcUrineCr].forEach(inp => {
+  inp.addEventListener('input', calcExcretion);
+});
+
+step3Continue.addEventListener('click', () => {
+  if (step3Continue.disabled) return;
+  goToStep(4);
+});
+
+/* =========================================================
+   11. STEP 4 — BRANCH-SPECIFIC WORKUP
+   ========================================================= */
+function setupStep4(){
+  const type = state.etiology.type;
+  if (!type) return;
+
+  const isRenal = type === 'renal';
+
+  branchBanner.className = 'branch-banner ' + (isRenal ? 'renal' : 'nonrenal');
+  branchBanner.innerHTML = `
+    <span class="b-dot"></span>
+    Current branch: <b>${isRenal ? 'Renal phosphate wasting' : 'Non‑renal causes'}</b>
+    — answer the relevant follow-up questions below.
+  `;
+  branchBanner.classList.remove('hidden');
+
+  renalWorkup.classList.toggle('hidden', !isRenal);
+  nonrenalWorkup.classList.toggle('hidden', isRenal);
+
+  workupTitle.textContent = isRenal
+    ? 'Renal Phosphate Wasting — Targeted Workup'
+    : 'Non‑Renal Causes — Targeted Workup';
+
+  workupSub.textContent = isRenal
+    ? 'Select PTH, FGF23 and urine calcium results (one option each) plus any Fanconi features to narrow the renal differential.'
+    : 'Select the clinical and laboratory features present to narrow the non‑renal differential.';
+
+  updateStep4();
+}
+
+function updateStep4(){
+  const type = state.etiology.type;
+  if (!type) return;
+
+  const isRenal = type === 'renal';
+
+  renalNarrowed.classList.add('hidden');
+  nonrenalNarrowed.classList.add('hidden');
+  emptyNarrowed.classList.add('hidden');
+
+  if (isRenal){
+    const rr = state.workup.renalRadio;
+    const f  = state.workup.fanconi;
+
+    const hasAny = rr.pth || rr.fgf23 || rr.urine_ca || f.size > 0;
+    if (!hasAny){
+      emptyNarrowed.classList.remove('hidden');
+      step4Continue.disabled = true;
+      return;
+    }
+
+    const items = [];
+
+    if (f.size >= 2){
+      items.push({ text:'Fanconi syndrome (generalized proximal tubular dysfunction)', top:true });
+    } else if (f.size === 1){
+      items.push({ text:'Possible Fanconi syndrome — confirm with additional tubular markers' });
+    }
+
+    const pthHigh      = rr.pth === 'pth_high';
+    const pthNormalLow = rr.pth === 'pth_normal_low';
+    const fgf23High    = rr.fgf23 === 'fgf23_high';
+    const fgf23Normal  = rr.fgf23 === 'fgf23_normal';
+    const caHigh       = rr.urine_ca === 'urine_ca_high';
+    const caLow        = rr.urine_ca === 'urine_ca_low';
+    const caNormal     = rr.urine_ca === 'urine_ca_normal';
+
+    if (pthHigh){
+      if (caHigh){
+        items.push({ text:'Primary hyperparathyroidism (high PTH, high urine Ca)', top:true });
+      } else if (caLow){
+        items.push({ text:'Secondary hyperparathyroidism (high PTH, low urine Ca)', top:true });
+      } else if (caNormal){
+        items.push({ text:'Primary hyperparathyroidism (high PTH, normal urine Ca)', top:true });
+        items.push({ text:'Consider secondary hyperparathyroidism (vitamin D deficiency)' });
+      } else {
+        items.push({ text:'Primary hyperparathyroidism' });
+        items.push({ text:'Secondary hyperparathyroidism' });
+      }
+    }
+
+    if (fgf23High){
+      items.push({ text:'FGF23-mediated — tumor-induced osteomalacia (acquired)', top:true });
+      items.push({ text:'FGF23-mediated — X-linked / autosomal hypophosphatemic rickets' });
+      items.push({ text:'Fibrous dysplasia / McCune-Albright syndrome' });
+      if (caNormal) items.push({ text:'Urine calcium is typically normal or low in FGF23-mediated disease' });
+    }
+
+    if (!pthHigh && !fgf23High){
+      if (pthNormalLow && fgf23Normal){
+        items.push({ text:'Primary tubular phosphate wasting (NPT2a / NPT2c)', top:true });
+        if (caHigh){
+          items.push({ text:'Hereditary hypophosphatemic rickets with hypercalciuria (HHRH)', top:true });
+        } else if (caLow){
+          items.push({ text:'Consider vitamin D deficiency / secondary hyperparathyroidism' });
+        } else if (caNormal){
+          items.push({ text:'Drug-induced renal phosphate wasting (tenofovir, ifosfamide, cisplatin, acetazolamide)' });
+          items.push({ text:'Intrinsic tubular disorder (RTA, post-ATN)' });
+        }
+      } else if (pthNormalLow && !rr.fgf23){
+        items.push({ text:'Check FGF23 — consider FGF23-mediated causes' });
+        items.push({ text:'Primary tubular phosphate wasting' });
+        if (caHigh) items.push({ text:'HHRH (hereditary hypophosphatemic rickets with hypercalciuria)' });
+        else if (caNormal) items.push({ text:'Drug-induced or intrinsic tubular disorder' });
+      } else if (!rr.pth && fgf23Normal){
+        items.push({ text:'Check PTH — consider primary hyperparathyroidism' });
+        items.push({ text:'Primary tubular phosphate wasting' });
+        if (caHigh) items.push({ text:'HHRH' });
+      } else if (!rr.pth && !rr.fgf23){
+        if (caHigh){
+          items.push({ text:'HHRH or other hypercalciuric phosphate-wasting disorder' });
+          items.push({ text:'Primary hyperparathyroidism (if PTH not yet measured)' });
+        } else if (caLow){
+          items.push({ text:'Vitamin D deficiency / secondary hyperparathyroidism (if PTH not measured)' });
+        } else if (caNormal){
+          items.push({ text:'Primary hyperparathyroidism or primary tubular wasting (if PTH / FGF23 not yet measured)' });
+        }
+      }
+    }
+
+    if (items.length === 0){
+      items.push({ text:'Drug-induced renal wasting (tenofovir, ifosfamide, cisplatin, acetazolamide)' });
+      items.push({ text:'Intrinsic tubular disorder (RTA, post-ATN)' });
+    }
+
+    const seen = new Set();
+    const unique = [];
+    items.forEach(it => {
+      if (!seen.has(it.text)){ seen.add(it.text); unique.push(it); }
+    });
+
+    let html = '<ul class="narrowed-list">';
+    unique.forEach(it => {
+      html += `<li class="${it.top ? 'top' : ''}">${it.text}</li>`;
+    });
+    html += '</ul>';
+
+    renalNarrowedBody.innerHTML = html;
+    renalNarrowed.classList.remove('hidden');
+    step4Continue.disabled = false;
+
+  } else {
+    const s = state.workup.nonrenal;
+
+    if (s.size === 0){
+      emptyNarrowed.classList.remove('hidden');
+      step4Continue.disabled = true;
+      return;
+    }
+
+    const items = [];
+    if (s.has('poor_intake'))   items.push({ text:'Inadequate intake / malnutrition / alcoholism', top:true });
+    if (s.has('gi_symptoms'))   items.push({ text:'Intestinal malabsorption / bariatric surgery', top:true });
+    if (s.has('vitd_low'))      items.push({ text:'Vitamin D deficiency (with or without secondary hyperparathyroidism)', top:true });
+    if (s.has('antacids'))      items.push({ text:'Phosphate binders / antacid use' });
+    if (s.has('resp_alkalosis'))items.push({ text:'Acute respiratory alkalosis (intracellular shift)', top:true });
+    if (s.has('refeeding'))     items.push({ text:'Refeeding syndrome', top:true });
+    if (s.has('insulin'))       items.push({ text:'Insulin administration / DKA recovery (intracellular shift)' });
+    if (s.has('hungry_bone'))   items.push({ text:'Hungry bone syndrome (post-parathyroidectomy)' });
+    if (s.has('cell_turnover')) items.push({ text:'Rapid cell turnover (leukaemia / lymphoma)' });
+
+    if (items.length === 0){
+      emptyNarrowed.classList.remove('hidden');
+      step4Continue.disabled = true;
+      return;
+    }
+
+    let html = '<ul class="narrowed-list">';
+    items.forEach(it => {
+      html += `<li class="${it.top ? 'top' : ''}">${it.text}</li>`;
+    });
+    html += '</ul>';
+
+    nonrenalNarrowedBody.innerHTML = html;
+    nonrenalNarrowed.classList.remove('hidden');
+    step4Continue.disabled = false;
+  }
+}
+
+step4Continue.addEventListener('click', () => {
+  if (step4Continue.disabled) return;
+  goToStep(5);
+});
+
+/* =========================================================
+   12. STEP 5 — TREATMENT PLAN
+   ========================================================= */
+function setupStep5(){
+  const v = state.phosphorus;
+  if (v === null) return;
+  const z = state.zone;
+  const emergency = state.clinical.emergency;
+
+  treatmentBanner.innerHTML = `
+    <div>
+      <div class="tb-label">Initial serum phosphorus</div>
+      <div class="tb-value" style="color:${z.color}">${v.toFixed(1)} <span>mg/dL</span></div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-tag" style="background:${z.bg};color:${z.text};border-color:${z.text}33">${z.short}</div>
+      <div class="tb-sub">${emergency
+        ? 'Critical clinical status — emergency pathway active'
+        : 'Clinically stable pathway'}</div>
+    </div>
+  `;
+
+  buildReplacement(v, z, emergency);
+  buildCauseSpecific();
+  buildMonitoring(v, z, emergency);
+}
+
+function oralDosingBlock(){
+  let rows = ORAL_FORMULATIONS.map(f => `
+    <tr>
+      <td class="brand">${f.brand}</td>
+      <td>${f.salt}</td>
+      <td class="elem">${f.elem}</td>
+      <td>${f.notes}</td>
+    </tr>
+  `).join('');
+
+  return `
+    <div class="tx-dosing-box">
+      <div class="db-title">Oral phosphate — dosing &amp; commercially available formulations</div>
+      <ul class="tx-ul">
+        <li><b>Standard adult starting dose:</b> 250–500 mg of <b>elemental phosphorus</b> 3–4 times daily (with meals and at bedtime).</li>
+        <li><b>Chronic hypophosphatemia:</b> 500–1,000 mg elemental phosphorus 2–3 times per day, titrated to serum phosphorus.</li>
+        <li><b>Severe cases (oral step-down):</b> up to ~1 g elemental phosphorus 3 times per day, with close monitoring.</li>
+        <li><b>Dose-limiting side effect:</b> diarrhoea — reduce the dose or switch to a different salt.</li>
+        <li><b>Renal impairment:</b> limit to ~1 g elemental phosphorus per day to avoid hyperphosphatemia.</li>
+        <li><b>Monitoring:</b> check urinary calcium periodically, especially in renal phosphate wasting, to reduce nephrocalcinosis risk.</li>
+      </ul>
+
+      <table class="formulation-table">
+        <thead>
+          <tr>
+            <th>Product / brand (example)</th>
+            <th>Salt</th>
+            <th>Elemental P per unit</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function buildReplacement(v, z, emergency){
+  let html = '';
+
+  if (v < 1.0){
+    html += `
+      <div class="tx-alert severe">
+        <b>IV phosphorus replacement is indicated.</b>
+        Severe hypophosphatemia (&lt; 1.0 mg/dL) requires parenteral therapy, especially when symptomatic.
+      </div>
+      <ul class="tx-ul">
+        <li>Admit to hospital (consider ICU / telemetry) and initiate continuous cardiac monitoring.</li>
+        <li>Use <b>IV sodium phosphate</b> or <b>IV potassium phosphate</b> per local protocol. A common adult regimen is ~0.08–0.16 mmol/kg elemental phosphate over 4–6 h, adjusted to severity and renal function.</li>
+        <li>Avoid rapid infusion — rapid IV phosphate can cause hypocalcemia, hypotension, and metastatic calcification.</li>
+        <li>Recheck serum phosphorus, calcium, magnesium, potassium, and renal function every 6–12 h during infusion.</li>
+        <li>Transition to oral phosphate once serum phosphorus is above 1.5–2.0 mg/dL and the patient is stable.</li>
+      </ul>
+    `;
+    html += oralDosingBlock();
+  } else if (v < 2.0){
+    if (emergency){
+      html += `
+        <div class="tx-alert moderate">
+          <b>IV phosphorus is recommended.</b>
+          Despite moderate hypophosphatemia (1.0–1.9 mg/dL), critical clinical findings make parenteral therapy appropriate.
+        </div>
+        <ul class="tx-ul">
+          <li>Admit and monitor; correct reversible causes (respiratory alkalosis, refeeding, insulin).</li>
+          <li>Give <b>IV phosphate</b> per local protocol while monitoring calcium and potassium.</li>
+          <li>Recheck phosphorus every 6–12 h; transition to oral therapy once stable.</li>
+        </ul>
+      `;
+    } else {
+      html += `
+        <div class="tx-alert mild">
+          <b>Oral phosphate replacement is usually sufficient.</b>
+          Moderate hypophosphatemia (1.0–1.9 mg/dL) without critical findings can be managed with oral therapy.
+        </div>
+        <ul class="tx-ul">
+          <li>Start oral phosphate if the patient is symptomatic or has ongoing losses.</li>
+          <li>If the patient is asymptomatic and a reversible cause is identified, treating the cause may be sufficient — recheck phosphorus in 24–48 h.</li>
+        </ul>
+      `;
+    }
+    html += oralDosingBlock();
+  } else if (v < 2.5){
+    html += `
+      <div class="tx-alert mild">
+        <b>Routine phosphorus replacement is usually not required.</b>
+        Mild hypophosphatemia (2.0–2.4 mg/dL) is often asymptomatic.
+      </div>
+      <ul class="tx-ul">
+        <li>Focus on identifying and correcting the underlying cause.</li>
+        <li>Consider oral phosphate if the patient is symptomatic or has ongoing renal or gastrointestinal losses.</li>
+        <li>Recheck serum phosphorus in 24–48 h, or sooner if symptoms develop.</li>
+      </ul>
+    `;
+    html += oralDosingBlock();
+  }
+
+  txReplacement.innerHTML = html;
+}
+
+function buildCauseSpecific(){
+  const type = state.etiology.type;
+  if (!type){
+    txCause.innerHTML = '<p class="tx-empty">Etiology not determined — treat the underlying disorder and replace phosphate as clinically indicated.</p>';
+    return;
+  }
+
+  const items = type === 'renal' ? buildRenalCauseItems() : buildNonrenalCauseItems();
+
+  if (items.length === 0){
+    txCause.innerHTML = '<p class="tx-empty">No specific cause selected — treat the underlying disorder and replace phosphate as clinically indicated.</p>';
+    return;
+  }
+
+  let html = '<div class="tx-cause-list">';
+  items.forEach(it => {
+    html += `
+      <div class="tx-cause-item">
+        <div class="tx-cause-title">${it.title}</div>
+        <div class="tx-cause-body">${it.body}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  txCause.innerHTML = html;
+}
+
+function buildRenalCauseItems(){
+  const rr = state.workup.renalRadio;
+  const f  = state.workup.fanconi;
+  const items = [];
+
+  if (f.size >= 2){
+    items.push({
+      title:'Fanconi syndrome',
+      body:'Stop any offending drug. Treat the underlying cause (e.g., multiple myeloma, cystinosis, Wilson disease, heavy metal exposure). Replace phosphate, potassium, and bicarbonate as needed, and give vitamin D. Nephrology involvement is recommended.'
+    });
+  }
+
+  const pthHigh      = rr.pth === 'pth_high';
+  const pthNormalLow = rr.pth === 'pth_normal_low';
+  const fgf23High    = rr.fgf23 === 'fgf23_high';
+  const fgf23Normal  = rr.fgf23 === 'fgf23_normal';
+  const caHigh       = rr.urine_ca === 'urine_ca_high';
+  const caLow        = rr.urine_ca === 'urine_ca_low';
+  const caNormal     = rr.urine_ca === 'urine_ca_normal';
+
+  if (pthHigh){
+    if (caHigh){
+      items.push({
+        title:'Primary hyperparathyroidism',
+        body:'Parathyroidectomy is definitive. Pre-operatively, use oral phosphate plus calcitriol if needed. Monitor calcium and phosphorus after surgery; watch for hungry bone syndrome.'
+      });
+    } else if (caLow){
+      items.push({
+        title:'Secondary hyperparathyroidism',
+        body:'Replete vitamin D (cholecalciferol or ergocalciferol), correct calcium intake, and treat CKD if present. Phosphate repletion is usually needed. Recheck PTH and phosphate after vitamin D repletion.'
+      });
+    } else if (caNormal){
+      items.push({
+        title:'Primary hyperparathyroidism (PTH elevated, urine Ca normal)',
+        body:'Confirm with serum calcium, ionized calcium, and 25-OH vitamin D. Localize with sestamibi / neck ultrasound and refer for parathyroidectomy. Pre-operatively use oral phosphate ± calcitriol. Monitor for hungry bone syndrome after surgery.'
+      });
+      items.push({
+        title:'Consider secondary hyperparathyroidism',
+        body:'If serum calcium is low or 25-OH vitamin D is deficient, treat as secondary hyperparathyroidism: replete vitamin D, correct calcium intake, and recheck PTH and phosphate.'
+      });
+    } else {
+      items.push({
+        title:'Hyperparathyroidism (primary or secondary)',
+        body:'Confirm the type with calcium, 25-OH vitamin D, and renal function. Primary → parathyroidectomy. Secondary → vitamin D repletion and treatment of the underlying cause.'
+      });
+    }
+  }
+
+  if (fgf23High){
+    items.push({
+      title:'FGF23-mediated phosphate wasting',
+      body:'For tumor-induced osteomalacia, localize and resect the tumor; if unresectable, use burosumab (anti-FGF23 monoclonal antibody) or phosphate plus calcitriol. For XLH, burosumab is preferred; phosphate plus calcitriol is an alternative. For ADHR / ARHR, use phosphate plus calcitriol or burosumab. Urine calcium is usually normal or low — do not use calcitriol if it causes hypercalciuria.'
+    });
+  }
+
+  if (!pthHigh && !fgf23High){
+    if (pthNormalLow && fgf23Normal){
+      if (caHigh){
+        items.push({
+          title:'Hereditary hypophosphatemic rickets with hypercalciuria (HHRH)',
+          body:'Use oral phosphate alone. Avoid calcitriol — it increases intestinal calcium absorption and worsens hypercalciuria / nephrocalcinosis risk.'
+        });
+      } else if (caLow){
+        items.push({
+          title:'Primary tubular phosphate wasting with low urine calcium',
+          body:'Consider concurrent vitamin D deficiency / secondary hyperparathyroidism. Use oral phosphate plus calcitriol; monitor calcium and urinary calcium to avoid nephrocalcinosis.'
+        });
+      } else if (caNormal){
+        items.push({
+          title:'Primary tubular phosphate wasting (NPT2a / NPT2c)',
+          body:'Use oral phosphate plus calcitriol tailored to symptoms and growth in children. Monitor urinary calcium to avoid nephrocalcinosis.'
+        });
+        items.push({
+          title:'Consider drug-induced or intrinsic tubular disorders',
+          body:'Review the medication list (tenofovir, ifosfamide, cisplatin, acetazolamide) and look for proximal tubular dysfunction. Stop offending agents when possible.'
+        });
+      }
+    } else if (pthNormalLow && !rr.fgf23){
+      items.push({
+        title:'Primary tubular phosphate wasting (pending FGF23)',
+        body:'Check FGF23 to exclude FGF23-mediated disease. Start oral phosphate ± calcitriol and monitor urinary calcium.'
+      });
+      if (caNormal){
+        items.push({
+          title:'Consider drug-induced or intrinsic tubular disorders',
+          body:'Review the medication list and look for proximal tubular dysfunction. Stop offending agents when possible.'
+        });
+      }
+    } else if (!rr.pth && fgf23Normal){
+      items.push({
+        title:'Primary tubular phosphate wasting (pending PTH)',
+        body:'Check PTH to exclude hyperparathyroidism. Start oral phosphate ± calcitriol and monitor urinary calcium.'
+      });
+    } else if (!rr.pth && !rr.fgf23){
+      if (caNormal){
+        items.push({
+          title:'Primary hyperparathyroidism or primary tubular wasting',
+          body:'Measure PTH and FGF23 to differentiate. Until then, use oral phosphate ± calcitriol and treat the presumed cause.'
+        });
+      }
+    }
+  }
+
+  items.push({
+    title:'Drug-induced renal phosphate wasting',
+    body:'Stop the offending drug when possible (e.g., tenofovir, ifosfamide, cisplatin, acetazolamide). Replace phosphate while the tubular injury resolves.'
+  });
+
+  items.push({
+    title:'Intrinsic tubular disorders',
+    body:'Treat the underlying tubular disorder. Replace phosphate, potassium, and bicarbonate as needed. Nephrology follow-up.'
+  });
+
+  return items;
+}
+
+function buildNonrenalCauseItems(){
+  const s = state.workup.nonrenal;
+  const items = [];
+
+  if (s.has('poor_intake'))   items.push({
+    title:'Inadequate intake / malnutrition / alcohol use',
+    body:'Oral phosphate supplementation plus nutritional support. In alcohol use disorder, give thiamine and correct magnesium.'
+  });
+  if (s.has('gi_symptoms'))   items.push({
+    title:'Malabsorption / bariatric surgery',
+    body:'Treat the underlying gastrointestinal disorder. Use oral phosphate and monitor for fat-soluble vitamin deficiencies.'
+  });
+  if (s.has('vitd_low'))      items.push({
+    title:'Vitamin D deficiency',
+    body:'Replete with cholecalciferol or ergocalciferol. Recheck 25-OH vitamin D, calcium, and phosphate. If secondary hyperparathyroidism is present, it usually resolves with vitamin D repletion.'
+  });
+  if (s.has('antacids'))      items.push({
+    title:'Phosphate binders / antacids',
+    body:'Stop or reduce aluminum- and calcium-based antacids. Recheck phosphorus after discontinuation.'
+  });
+  if (s.has('resp_alkalosis'))items.push({
+    title:'Respiratory alkalosis',
+    body:'Treat the underlying cause of hyperventilation. Phosphorus typically corrects as the alkalosis resolves; phosphate replacement is rarely required.'
+  });
+  if (s.has('refeeding'))     items.push({
+    title:'Refeeding syndrome',
+    body:'Slow the rate of caloric reintroduction. Supplement phosphate, potassium, and magnesium. Monitor electrolytes daily during the first week.'
+  });
+  if (s.has('insulin'))       items.push({
+    title:'Insulin administration / DKA recovery',
+    body:'Hypophosphatemia is usually transient. Replace phosphate only if the level is < 1.0 mg/dL, the patient is symptomatic, or respiratory / cardiac function is compromised.'
+  });
+  if (s.has('hungry_bone'))   items.push({
+    title:'Hungry bone syndrome',
+    body:'Aggressive calcium and vitamin D replacement (calcitriol preferred). Add phosphate if levels are low. Monitor calcium, phosphate, and magnesium every 6–12 h initially.'
+  });
+  if (s.has('cell_turnover')) items.push({
+    title:'Rapid cell turnover (leukemia / lymphoma)',
+    body:'Treat the underlying malignancy. Monitor phosphorus, potassium, calcium, and uric acid for tumor lysis syndrome.'
+  });
+
+  return items;
+}
+
+function buildMonitoring(v, z, emergency){
+  const items = [
+    'Serum phosphorus, calcium, magnesium, and potassium at baseline and after each replacement dose.',
+    'Renal function (creatinine, eGFR) to guide dosing and monitor for nephrocalcinosis in renal wasting.',
+    '12-lead ECG if severe or if cardiac symptoms are present.',
+    'Recheck serum phosphorus within 24–48 h once oral therapy is started.'
+  ];
+  if (emergency){
+    items.unshift('Continuous cardiac monitoring until phosphorus and electrolytes are stable.');
+  }
+  if (state.etiology.type === 'renal'){
+    items.push('Urinary calcium and renal ultrasound in chronic renal phosphate wasting to screen for nephrocalcinosis.');
+  }
+  if (state.etiology.type === 'nonrenal' && state.workup.nonrenal.has('refeeding')){
+    items.push('Daily electrolytes for at least the first week of refeeding.');
+  }
+
+  let html = '<ul class="tx-ul">';
+  items.forEach(it => html += `<li>${it}</li>`);
+  html += '</ul>';
+  txMonitoring.innerHTML = html;
+}
+
+step5Continue.addEventListener('click', () => {
+  goToStep(6);
+});
+
+/* =========================================================
+   13. NAVIGATION
+   ========================================================= */
+function goToStep(n){
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('hidden', p.id !== 'panel-' + n);
+  });
+
+  if (n === 2) updateStep2();
+
+  if (n === 3){
+    if (state.phosphorus) calcSerumP.value = state.phosphorus.toFixed(1);
+    calcExcretion();
+  }
+
+  if (n === 4) setupStep4();
+  if (n === 5) setupStep5();
+  if (n === 6) renderSummary();
+
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+document.querySelectorAll('[data-goto]').forEach(btn => {
+  btn.addEventListener('click', () => goToStep(Number(btn.dataset.goto)));
+});
+
+/* =========================================================
+   14. STEP 1 BUTTONS
+   ========================================================= */
+slider.addEventListener('input', updateLive);
+
+continueBtn.addEventListener('click', () => {
+  const z = state.zone;
+
+  if (z.key === 'normal'){
+    showEndResult(
+      'ok',
+      'Normal serum phosphorus',
+      `The value of <b>${state.phosphorus.toFixed(1)} mg/dL</b> is within the reference range (2.5 – 4.5 mg/dL).
+       There is no hypophosphatemia, so this pathway ends here.`
+    );
+    return;
+  }
+
+  if (z.key === 'high'){
+    showEndResult(
+      'warn',
+      'Above the reference range',
+      `The value of <b>${state.phosphorus.toFixed(1)} mg/dL</b> is above the reference range (&gt; 4.5 mg/dL).
+       This is hyperphosphatemia — the hypophosphatemia pathway does not apply.`
+    );
+    return;
+  }
+
+  goToStep(2);
+});
+
+resetBtn.addEventListener('click', () => {
+  slider.value = 1.8;
+  updateLive();
+});
+
+/* =========================================================
+   15. SUMMARY
+   ========================================================= */
+function labelForRadio(groupId, optId){
+  const g = RENAL_RADIO_GROUPS.find(x => x.id === groupId);
+  if (!g) return optId;
+  const o = g.options.find(x => x.id === optId);
+  return o ? `${g.title}: ${o.label}` : optId;
+}
+
+function treatmentHeadlines(){
+  const v = state.phosphorus;
+  const emergency = state.clinical.emergency;
+  let repl = '—';
+  if (v !== null){
+    if (v < 1.0) repl = 'IV phosphorus indicated (severe) → step down to oral once P > 1.5–2.0 mg/dL';
+    else if (v < 2.0) repl = emergency ? 'IV phosphorus indicated (critical clinical status)' : 'Oral phosphate 250–500 mg elemental P 3–4×/day';
+    else if (v < 2.5) repl = 'Routine replacement usually not required; oral phosphate only if symptomatic';
+  }
+
+  let cause = 'Treat underlying cause';
+  if (state.etiology.type === 'renal'){
+    const rr = state.workup.renalRadio;
+    if (rr.fgf23 === 'fgf23_high')
+      cause = 'FGF23-mediated — burosumab or phosphate + calcitriol; resect tumor if TIO';
+    else if (rr.pth === 'pth_high')
+      cause = 'Hyperparathyroidism — parathyroidectomy (primary) or vitamin D repletion (secondary)';
+    else if (state.workup.fanconi.size >= 2)
+      cause = 'Fanconi syndrome — stop offending drug, replace phosphate and electrolytes';
+    else if (rr.urine_ca === 'urine_ca_high' && rr.pth === 'pth_normal_low')
+      cause = 'HHRH — oral phosphate alone; avoid calcitriol';
+    else
+      cause = 'Renal phosphate wasting — oral phosphate ± calcitriol; treat underlying cause';
+  } else {
+    const s = state.workup.nonrenal;
+    if (s.has('refeeding'))          cause = 'Refeeding syndrome — slow feeding, replace phosphate/K/Mg';
+    else if (s.has('hungry_bone'))    cause = 'Hungry bone syndrome — calcium, calcitriol, phosphate';
+    else if (s.has('vitd_low'))       cause = 'Vitamin D deficiency — vitamin D repletion';
+    else if (s.has('resp_alkalosis')) cause = 'Respiratory alkalosis — treat underlying cause; phosphate rarely needed';
+    else if (s.has('poor_intake'))    cause = 'Nutritional repletion + oral phosphate';
+    else if (s.has('gi_symptoms'))    cause = 'Treat malabsorption + oral phosphate';
+    else if (s.size > 0)              cause = 'Treat underlying cause + oral phosphate as indicated';
+  }
+
+  return { repl, cause };
+}
+
+function getSummaryGroups(){
+  const groups = [];
+
+  const lab = [];
+  if (state.phosphorus !== null){
+    lab.push(['Serum phosphorus', state.phosphorus.toFixed(1) + ' mg/dL']);
+    lab.push(['Severity', state.zone.name + ' (' + state.zone.range + ')']);
+    lab.push(['Reference range', '2.5 – 4.5 mg/dL']);
+  } else {
+    lab.push(['Serum phosphorus', 'Not entered']);
+  }
+  groups.push({ title:'Laboratory', rows: lab });
+
+  const clinical = [];
+  const allSymptoms = [...CRITICAL_SYMPTOMS, ...MILD_SYMPTOMS];
+
+  if (state.clinical.selected.size > 0){
+    const labels = allSymptoms
+      .filter(s => state.clinical.selected.has(s.id))
+      .map(s => s.label);
+    clinical.push(['Symptoms reported', labels.join('; ')]);
+  } else {
+    clinical.push(['Symptoms reported', 'None']);
+  }
+
+  if (state.clinical.emergency){
+    clinical.push(['Clinical status', 'Emergency — severe hypophosphatemia or critical findings']);
+    clinical.push(['Emergency management', state.clinical.emergencyConfirmed
+      ? 'Confirmed / initiated (admission + IV phosphorus)'
+      : 'Pending confirmation']);
+  } else {
+    clinical.push(['Clinical status', 'Stable — no critical findings']);
+  }
+
+  groups.push({ title:'Clinical assessment', rows: clinical });
+
+  if (state.etiology.type){
+    const label = state.etiology.type === 'renal'
+      ? 'Renal phosphate wasting'
+      : 'Non‑renal causes';
+
+    const rows = [
+      ['Category', label],
+      ['Discriminating test', 'FePO₄ / TmP/GFR']
+    ];
+
+    if (state.etiology.calc){
+      const c = state.etiology.calc;
+      rows.push(['FePO₄',          c.fePO4.toFixed(1) + ' %']);
+      rows.push(['TmP/GFR',        c.tmPGFR.toFixed(2) + ' mg/dL']);
+      rows.push(['Urine phosphorus',  c.uP  + ' mg/dL']);
+      rows.push(['Serum creatinine',  c.sCr + ' mg/dL']);
+      rows.push(['Urine creatinine',  c.uCr + ' mg/dL']);
+    }
+
+    groups.push({ title:'Etiology', rows });
+  }
+
+  if (state.etiology.type){
+    const isRenal = state.etiology.type === 'renal';
+    const rows = [];
+
+    if (isRenal){
+      const rr = state.workup.renalRadio;
+      if (rr.pth)     rows.push(['PTH',           labelForRadio('pth',      rr.pth).replace(/^PTH: /,'')]);
+      if (rr.fgf23)   rows.push(['FGF23',         labelForRadio('fgf23',    rr.fgf23).replace(/^FGF23 \(intact\): /,'')]);
+      if (rr.urine_ca)rows.push(['Urine calcium', labelForRadio('urine_ca', rr.urine_ca).replace(/^Urine calcium: /,'')]);
+
+      if (state.workup.fanconi.size){
+        const labels = FANCONI_FEATURES
+          .filter(x => state.workup.fanconi.has(x.id))
+          .map(x => x.label);
+        rows.push(['Fanconi features', labels.join('; ')]);
+      }
+    } else {
+      const s = state.workup.nonrenal;
+      if (s.size){
+        const labels = NONRENAL_TESTS
+          .filter(x => s.has(x.id))
+          .map(x => x.label);
+        rows.push(['Non‑renal features', labels.join('; ')]);
+      }
+    }
+
+    if (rows.length){
+      groups.push({ title:'Targeted workup', rows });
+    }
+  }
+
+  if (state.phosphorus !== null && state.etiology.type){
+    const h = treatmentHeadlines();
+    groups.push({
+      title:'Treatment',
+      rows: [
+        ['Phosphorus replacement', h.repl],
+        ['Cause-specific management', h.cause]
+      ]
+    });
+  }
+
+  return groups;
+}
+
+function renderSummary(){
+  const groups = getSummaryGroups();
+  const el = document.getElementById('summaryContent');
+
+  const dateStr = new Date().toLocaleString('en-GB', {
+    day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+
+  let html = `<h3>Assessment — ${dateStr}</h3>`;
+  html += `<div class="srow"><span class="k">Tool</span><span class="v">Hypophosphatemia Wizard</span></div>`;
+
+  groups.forEach(g => {
+    html += `<div class="group"><h3>${g.title}</h3>`;
+    g.rows.forEach(([k, v]) => {
+      html += `<div class="srow"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+    });
+    html += `</div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+/* =========================================================
+   16. COPY & PRINT
+   ========================================================= */
+function buildPlainText(){
+  const groups = getSummaryGroups();
+  const dateStr = new Date().toLocaleString('en-GB', {
+    day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+
+  let out = `HYPOPHOSPHATEMIA ASSESSMENT\n${dateStr}\n${'='.repeat(42)}\n\n`;
+
+  groups.forEach(g => {
+    out += `${g.title.toUpperCase()}\n`;
+    g.rows.forEach(([k, v]) => {
+      out += `  ${k}: ${v}\n`;
+    });
+    out += `\n`;
+  });
+
+  return out.trim();
+}
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const text = buildPlainText();
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard');
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied to clipboard');
+  }
+});
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  window.print();
+});
+
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+/* =========================================================
+   17. INIT
+   ========================================================= */
+updateLive();
+</script>
+</body>
+</html>
