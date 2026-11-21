@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f766e">
+<title>مجموعه کیس‌های بالینی هیپوفسفاتمی | آموزش تخصصی داخلی</title>
+<style>
+:root{
+  --bg:#f4f7f8;--surface:#fff;--surface-2:#f8fafb;--text:#18252d;--muted:#60717b;
+  --line:#e2e9ec;--primary:#0f766e;--primary-dark:#115e59;--primary-soft:#e6f4f1;
+  --blue:#2563eb;--blue-soft:#eff6ff;--green:#15803d;--green-soft:#ecfdf3;
+  --amber:#a16207;--amber-soft:#fffbeb;--red:#b91c1c;--red-soft:#fef2f2;
+  --shadow:0 12px 34px rgba(18,44,54,.07);--radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",Arial,sans-serif;line-height:1.85}
+button,input{font:inherit}
+a{color:#0b70a5;text-decoration:none}
+a:hover{text-decoration:underline}
+.container{width:min(1120px,calc(100% - 32px));margin:auto}
+.hero{padding:38px 0 26px;background:linear-gradient(130deg,#0b4f50,#0f766e 62%,#168b83);color:#fff}
+.hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border:1px solid #ffffff45;background:#ffffff15;border-radius:999px;font-size:12px;color:#e5fffb}
+h1{font-size:clamp(25px,4vw,36px);line-height:1.45;margin:12px 0 8px;font-weight:800}
+.hero p{margin:0;color:#d6f4ef;max-width:720px;font-size:14px}
+.hero-stat{min-width:130px;padding:13px 18px;border:1px solid #ffffff45;background:#ffffff15;border-radius:16px;text-align:center}
+.hero-stat strong{display:block;font-size:28px;line-height:1.3}
+.hero-stat span{font-size:12px;color:#d6f4ef}
+.toolbar-wrap{position:sticky;top:0;z-index:20;background:#f4f7f8eF;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 0;flex-wrap:wrap}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 40px 10px 13px;outline:none;color:var(--text)}
+.search input:focus{border-color:var(--primary);box-shadow:0 0 0 3px #0f766e18}
+.search:before{content:"⌕";position:absolute;right:14px;top:3px;font-size:24px;color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:11px;padding:9px 13px;cursor:pointer;font-size:13px;font-weight:700;transition:.2s}
+.btn:hover{transform:translateY(-1px);border-color:#a9c8c4}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:white}
+.btn.primary:hover{background:var(--primary-dark)}
+.btn:focus-visible{outline:3px solid #0f766e45;outline-offset:2px}
+main{padding:26px 0 54px}
+.intro{display:flex;align-items:flex-start;gap:12px;background:var(--blue-soft);border:1px solid #dbeafe;padding:14px 16px;border-radius:15px;margin-bottom:22px;color:#1e3a8a;font-size:13px}
+.intro .symbol{font-size:20px;line-height:1.5}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 22px;overflow:hidden;scroll-margin-top:90px}
+.case-head{padding:21px 24px 17px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#fbfdfd)}
+.case-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.case-number{display:inline-flex;align-items:center;gap:8px;color:var(--primary);font-size:12px;font-weight:800;letter-spacing:.1px}
+.pill{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;background:var(--blue-soft);color:#1d4ed8}
+.pill.advanced{background:#f5f3ff;color:#6d28d9}
+.pill.critical{background:var(--red-soft);color:var(--red)}
+.case h2{margin:8px 0 3px;font-size:21px;line-height:1.6}
+.case-subtitle{margin:0;color:var(--muted);font-size:13px}
+.case-body{padding:22px 24px 24px}
+.section-title{display:flex;align-items:center;gap:8px;margin:4px 0 10px;font-weight:800;font-size:15px}
+.section-title:before{content:"";width:4px;height:18px;border-radius:4px;background:var(--primary)}
+.clinical-text{margin:0 0 15px;color:#344650;font-size:14px}
+.lab-table{width:100%;border-collapse:separate;border-spacing:0;margin:9px 0 18px;border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px}
+.lab-table th{background:#f0f6f5;color:#31534f;font-weight:800;text-align:right}
+.lab-table th,.lab-table td{padding:9px 12px;border-bottom:1px solid var(--line)}
+.lab-table tr:last-child td{border-bottom:0}
+.lab-table td:last-child,.lab-table th:last-child{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;font-weight:700}
+.lab-table tr:nth-child(even) td{background:#fcfdfd}
+.options{display:grid;gap:9px;margin:12px 0 18px}
+.option{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:13.5px;transition:.18s}
+.option:hover{border-color:#b8d4d0;background:#fbfefd}
+.option-letter{display:grid;place-items:center;flex:0 0 27px;height:27px;border-radius:8px;background:#eef3f5;color:#3d5661;font-weight:800;font-size:12px;direction:ltr}
+.question{background:var(--surface-2);border:1px dashed #cbd8dc;padding:13px 15px;border-radius:12px;margin:14px 0 12px;font-size:14px;font-weight:800}
+.answer-toggle{display:flex;align-items:center;gap:9px;margin-top:16px}
+.answer-toggle .btn{padding:10px 16px}
+.answer{display:none;margin-top:17px;border:1px solid #b8e0d1;background:#fbfffd;border-radius:15px;overflow:hidden}
+.answer.show{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.answer-head{display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--green-soft);border-bottom:1px solid #d1fae5}
+.correct{font-size:13px;color:#166534;font-weight:900}
+.answer-content{padding:17px 18px;font-size:13.5px;color:#30434b}
+.answer-content p{margin:0 0 10px}
+.answer-content ul,.answer-content ol{margin:7px 0 14px;padding-right:22px}
+.answer-content li{margin:4px 0}
+.keypoint{margin:13px 0;padding:12px 14px;border-right:3px solid var(--primary);border-radius:8px;background:var(--primary-soft);color:#164e49}
+.caution{margin:13px 0;padding:12px 14px;border-right:3px solid #d97706;border-radius:8px;background:var(--amber-soft);color:#713f12}
+.mini-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:12.5px}
+.mini-table th,.mini-table td{padding:8px 9px;border:1px solid var(--line);text-align:right}
+.mini-table th{background:#f2f6f7}
+.references{padding:12px 15px;background:#f7fafb;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.references strong{color:#42545c}
+.references ol{margin:6px 0 0;padding-right:19px}
+.references li{margin:4px 0}
+.references a{overflow-wrap:anywhere}
+.footer{color:var(--muted);font-size:12px;text-align:center;padding:6px 0 30px}
+.empty{display:none;text-align:center;background:white;border:1px dashed var(--line);border-radius:15px;padding:30px;color:var(--muted)}
+.progress{height:6px;background:#dce8e6;border-radius:99px;overflow:hidden;margin-top:8px}
+.progress>span{display:block;height:100%;width:0;background:#a7f3d0;transition:width .25s}
+@media(max-width:650px){.container{width:min(100% - 22px,1120px)}.hero{padding:27px 0 22px}.hero-stat{min-width:100px}.case-head{padding:17px 16px 14px}.case-body{padding:17px 15px 19px}.case h2{font-size:18px}.lab-table{font-size:12px}.lab-table th,.lab-table td{padding:8px 7px}.option{font-size:13px}.actions{width:100%}.actions .btn{flex:1}.search{min-width:100%}.toolbar{gap:8px}}
+@media print{body{background:#fff;font-size:11pt}.hero{background:#fff!important;color:#111;padding:10px 0;border-bottom:2px solid #333}.hero p,.eyebrow,.hero-stat span{color:#333}.hero-stat{border:1px solid #bbb;color:#111}.toolbar-wrap,.answer-toggle,.footer{display:none!important}main{padding:10px 0}.case{box-shadow:none;break-inside:avoid;border:1px solid #bbb;margin-bottom:14px}.case-head{background:#fff}.answer{display:block!important;break-inside:avoid}.references{background:#fff}.intro{background:#fff;color:#222}.case h2{font-size:16pt}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="container hero-inner">
+    <div>
+      <div class="eyebrow">● آموزش مبتنی بر کیس · طب داخلی</div>
+      <h1>هیپوفسفاتمی | مجموعه کیس‌های بالینی</h1>
+      <p>پنج سناریوی تخصصی برای تمرین استدلال بالینی، تفسیر آزمایش‌ها، تشخیص افتراقی و تصمیم‌گیری درمانی</p>
+    </div>
+    <div class="hero-stat"><strong>۵</strong><span>کیس آموزشی</span></div>
+  </div>
+</header>
+<div class="toolbar-wrap">
+  <div class="container toolbar">
+    <div class="search"><input id="searchInput" type="search" placeholder="جست‌وجو در عنوان، متن کیس یا تشخیص..." aria-label="جست‌وجو در کیس‌ها"></div>
+    <div class="actions">
+      <button class="btn" id="expandAll">نمایش همه پاسخ‌ها</button>
+      <button class="btn" id="collapseAll">بستن همه پاسخ‌ها</button>
+      <button class="btn primary" onclick="window.print()">چاپ / ذخیره PDF</button>
+    </div>
+  </div>
+</div>
+<main class="container">
+  <div class="intro"><span class="symbol">ⓘ</span><div><strong>راهنمای استفاده:</strong> ابتدا کیس و چهار گزینه را بررسی کنید؛ سپس دکمه «نمایش پاسخ و توضیح» را بزنید. برای مرور بدون پاسخ، می‌توانید پاسخ‌ها را بسته نگه دارید. مقادیر آزمایشگاهی و سناریوها آموزشی‌اند و جایگزین ارزیابی بیمار واقعی یا پروتکل مرکز درمانی نیستند.</div></div>
+
+  <article class="case" data-search="tumor induced osteomalacia tio fgf23 tm pgfr renal phosphate wasting ga dotatate pet ct osteomalacia تومور استئومالاسی">
+    <div class="case-head">
+      <div class="case-top"><span class="case-number">CASE 01 · تشخیص علت دفع کلیوی فسفات</span><span class="pill advanced">سطح تخصصی</span></div>
+      <h2>هیپوفسفاتمی مزمن با دفع کلیوی فسفات</h2>
+      <p class="case-subtitle">تمرکز: تفسیر TmP/GFR، FGF23 و انتخاب تصویربرداری برای یافتن تومور</p>
+    </div>
+    <div class="case-body">
+      <h3 class="section-title">شرح حال و یافته‌های بالینی</h3>
+      <p class="clinical-text">مرد ۵۲ ساله‌ای با سابقه ۱۸ ماه درد منتشر استخوانی، ضعف عضلات پروگزیمال و دشواری در برخاستن از حالت نشسته مراجعه کرده است. در بررسی‌ها، شکستگی استرسی در استخوان متاتارس مشاهده می‌شود.</p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>نتیجه</th></tr></thead><tbody>
+        <tr><td>Serum phosphate</td><td>1.3 mg/dL</td></tr><tr><td>Calcium</td><td>9.2 mg/dL</td></tr><tr><td>ALP</td><td>380 U/L</td></tr><tr><td>Creatinine</td><td>0.9 mg/dL</td></tr><tr><td>25-OH Vitamin D</td><td>34 ng/mL</td></tr><tr><td>PTH</td><td>طبیعی</td></tr><tr><td>1,25-(OH)₂ Vitamin D</td><td>پایین</td></tr><tr><td>TmP/GFR</td><td>پایین</td></tr><tr><td>Intact FGF23</td><td>بالا</td></tr>
+      </tbody></table>
+      <p class="clinical-text">بیمار سابقه خانوادگی مشابهی ندارد و در دوران کودکی نیز اختلال رشد اسکلتی نداشته است.</p>
+      <div class="question">مناسب‌ترین اقدام تشخیصی بعدی کدام است؟</div>
+      <div class="options">
+        <div class="option"><span class="option-letter">A</span><span>انجام بیوپسی کلیه برای بررسی اختلالات توبولی</span></div>
+        <div class="option"><span class="option-letter">B</span><span>شروع مکمل فسفات و تکرار آزمایش‌ها پس از سه ماه، بدون بررسی بیشتر</span></div>
+        <div class="option"><span class="option-letter">C</span><span>انجام Whole-body <bdi dir="ltr">⁶⁸Ga-DOTATATE PET/CT</bdi> برای یافتن تومور مولد <bdi dir="ltr">FGF23</bdi> و سپس تصویربرداری آناتومیک هدفمند</span></div>
+        <div class="option"><span class="option-letter">D</span><span>بررسی مجدد کمبود ویتامین D با اندازه‌گیری مکرر 25-OH Vitamin D</span></div>
+      </div>
+      <div class="answer-toggle"><button class="btn primary toggle-answer" aria-expanded="false">نمایش پاسخ و توضیح <span>＋</span></button></div>
+      <section class="answer" aria-label="پاسخ سؤال اول">
+        <div class="answer-head"><span>✓</span><span class="correct">پاسخ صحیح: گزینه C</span></div>
+        <div class="answer-content">
+          <p><strong>تشخیص محتمل: Tumor-Induced Osteomalacia (TIO).</strong> این بیمار الگوی بیوشیمیایی تیپیک استئومالاسی ناشی از تومور ترشح‌کننده FGF23 را دارد.</p>
+          <ol>
+            <li>هیپوفسفاتمی همراه با TmP/GFR پایین، بیانگر بازجذب نامتناسب و دفع کلیوی فسفات است.</li>
+            <li>افزایش FGF23 موجب کاهش بازجذب فسفات در توبول پروگزیمال و مهار تولید 1,25-(OH)₂ Vitamin D می‌شود.</li>
+            <li>افزایش ALP، درد استخوانی، ضعف عضلانی و شکستگی استرسی با استئومالاسی هیپوفسفاتمیک سازگارند.</li>
+            <li>پس از تأیید بیوشیمیایی، تصویربرداری عملکردی تمام بدن با ردیاب‌های گیرنده سوماتواستاتین مانند <bdi dir="ltr">⁶⁸Ga-DOTATATE PET/CT</bdi> انجام می‌شود؛ اگر ضایعه‌ای یافت شد، MRI یا CT هدفمند برای تعیین دقیق محل لازم است.</li>
+          </ol>
+          <div class="keypoint"><strong>نکته کلیدی:</strong> تصویربرداری برای یافتن تومور باید پس از اثبات الگوی بیوشیمیایی دفع کلیوی فسفات وابسته به FGF23 انجام شود؛ تصویربرداری آناتومیک هدفمند معمولاً بعد از لوکالیزاسیون عملکردی است. برداشت کامل تومور، در صورت امکان، درمان بالقوه قطعی است.</div>
+        </div>
+        <div class="references"><strong>منابع منتخب</strong><ol>
+          <li>Jan de Beur SM, et al. Global guidance for the recognition, diagnosis, and management of tumor-induced osteomalacia. <i>J Intern Med.</i> 2023;293:309–328. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10108006/" target="_blank" rel="noopener">متن کامل مقاله</a>.</li>
+        </ol></div>
+      </section>
+    </div>
+  </article>
+
+  <article class="case" data-search="ferric carboxymaltose intravenous iron fgf23 hypophosphatemia calcitriol renal phosphate wasting iron deficiency کم خونی آهن">
+    <div class="case-head">
+      <div class="case-top"><span class="case-number">CASE 02 · عارضه دارویی</span><span class="pill advanced">پاتوفیزیولوژی</span></div>
+      <h2>هیپوفسفاتمی ناشی از درمان کم‌خونی فقر آهن</h2>
+      <p class="case-subtitle">تمرکز: اثر Ferric carboxymaltose بر FGF23 و متابولیسم فسفات</p>
+    </div>
+    <div class="case-body">
+      <h3 class="section-title">شرح حال و یافته‌های بالینی</h3>
+      <p class="clinical-text">خانم ۴۶ ساله‌ای با سابقه کم‌خونی فقر آهن به علت منوراژی، به دلیل عدم تحمل آهن خوراکی تحت درمان با <bdi dir="ltr">Ferric carboxymaltose</bdi> قرار گرفته است. بیمار دو دوز ۷۵۰ میلی‌گرمی با فاصله یک هفته دریافت کرده است. سه هفته پس از آخرین تزریق، با شکایت از ضعف عضلات پروگزیمال، درد منتشر استخوانی و دشواری در راه رفتن مراجعه می‌کند.</p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>نتیجه</th></tr></thead><tbody>
+        <tr><td>Serum phosphate</td><td>1.1 mg/dL</td></tr><tr><td>Calcium</td><td>8.7 mg/dL</td></tr><tr><td>ALP</td><td>245 U/L</td></tr><tr><td>Creatinine</td><td>0.8 mg/dL</td></tr><tr><td>25-OH Vitamin D</td><td>32 ng/mL</td></tr><tr><td>1,25-(OH)₂ Vitamin D</td><td>پایین</td></tr><tr><td>PTH</td><td>کمی افزایش‌یافته</td></tr><tr><td>TmP/GFR</td><td>پایین</td></tr><tr><td>Intact FGF23</td><td>افزایش‌یافته</td></tr>
+      </tbody></table>
+      <div class="question">کدام مکانیسم، این مجموعه یافته‌ها را بهتر توضیح می‌دهد؟</div>
+      <div class="options">
+        <div class="option"><span class="option-letter">A</span><span>مهار مستقیم ناقل‌های سدیم ـ فسفات در روده و کاهش جذب فسفات</span></div>
+        <div class="option"><span class="option-letter">B</span><span>افزایش FGF23 و در نتیجه کاهش بازجذب کلیوی فسفات، همراه با مهار تولید 1,25-(OH)₂ Vitamin D</span></div>
+        <div class="option"><span class="option-letter">C</span><span>افزایش PTH به‌عنوان عامل اولیه دفع کلیوی فسفات، مستقل از FGF23</span></div>
+        <div class="option"><span class="option-letter">D</span><span>ورود فسفات به داخل سلول‌ها در اثر افزایش ترشح انسولین پس از تزریق آهن</span></div>
+      </div>
+      <div class="answer-toggle"><button class="btn primary toggle-answer" aria-expanded="false">نمایش پاسخ و توضیح <span>＋</span></button></div>
+      <section class="answer" aria-label="پاسخ سؤال دوم">
+        <div class="answer-head"><span>✓</span><span class="correct">پاسخ صحیح: گزینه B</span></div>
+        <div class="answer-content">
+          <p><strong>مکانیسم: افزایش FGF23 فعال و ایجاد renal phosphate wasting.</strong></p>
+          <ol>
+            <li><bdi dir="ltr">Ferric carboxymaltose</bdi> می‌تواند غلظت FGF23 بیولوژیکاً فعال (intact FGF23) را افزایش دهد.</li>
+            <li>FGF23 بیان ناقل‌های سدیم ـ فسفات در توبول پروگزیمال را کاهش می‌دهد و دفع کلیوی فسفات را افزایش می‌دهد.</li>
+            <li>هم‌زمان، تولید کلیوی 1,25-(OH)₂ Vitamin D کاهش می‌یابد؛ کاهش Calcitriol و کلسیم می‌تواند به افزایش ثانویه PTH کمک کند.</li>
+          </ol>
+          <div class="keypoint"><strong>نکته بالینی:</strong> هیپوفسفاتمی پس از Ferric carboxymaltose ممکن است پایدار بماند و در مواجهه مکرر، به‌ندرت با استئومالاسی و شکستگی همراه شود. خطر بین فرآورده‌های مختلف آهن وریدی یکسان نیست؛ در کارآزمایی مقایسه‌ای، بروز هیپوفسفاتمی با Ferric carboxymaltose به‌مراتب بیشتر از Ferumoxytol بود.</div>
+          <div class="caution"><strong>نکته پایش:</strong> در بیمار پرخطر، دریافت‌کننده دوره‌های مکرر یا فردی با ضعف و درد استخوانی پس از تزریق، اندازه‌گیری فسفات سرم را در نظر بگیرید؛ تداوم هیپوفسفاتمی نیازمند ارزیابی علت و شدت و بررسی عوارض استخوانی است.</div>
+        </div>
+        <div class="references"><strong>منابع منتخب</strong><ol>
+          <li>Wolf M, et al. Randomized trial of intravenous iron-induced hypophosphatemia. <i>JCI Insight.</i> 2018;3(23):e124486. <a href="https://insight.jci.org/articles/view/124486" target="_blank" rel="noopener">متن مقاله</a>.</li>
+        </ol></div>
+      </section>
+    </div>
+  </article>
+
+  <article class="case" data-search="tenofovir disoproxil fumarate fanconi syndrome proximal renal tubular dysfunction glycosuria aminoaciduria bicarbonate phosphate wasting فانکونی">
+    <div class="case-head">
+      <div class="case-top"><span class="case-number">CASE 03 · اختلال توبول پروگزیمال</span><span class="pill advanced">تشخیص افتراقی</span></div>
+      <h2>افتراق سندرم فانکونی از دفع فسفات وابسته به FGF23</h2>
+      <p class="case-subtitle">تمرکز: شناسایی الگوی Generalized proximal tubular dysfunction</p>
+    </div>
+    <div class="case-body">
+      <h3 class="section-title">شرح حال و یافته‌های بالینی</h3>
+      <p class="clinical-text">مرد ۵۸ ساله‌ای با سابقه هپاتیت B مزمن، به دلیل ضعف عضلات پروگزیمال، درد استخوانی و اختلال در راه رفتن مراجعه می‌کند. بیمار طی ۴ سال گذشته <bdi dir="ltr">Tenofovir disoproxil fumarate (TDF)</bdi> دریافت کرده است.</p>
+      <table class="lab-table"><thead><tr><th>پارامتر</th><th>نتیجه</th></tr></thead><tbody>
+        <tr><td>Serum phosphate</td><td>1.2 mg/dL</td></tr><tr><td>Serum potassium</td><td>3.1 mEq/L</td></tr><tr><td>HCO₃⁻</td><td>17 mEq/L</td></tr><tr><td>Serum glucose</td><td>96 mg/dL</td></tr><tr><td>Urine glucose</td><td>2+</td></tr><tr><td>Serum uric acid</td><td>پایین</td></tr><tr><td>Urine amino acids</td><td>افزایش‌یافته</td></tr><tr><td>TmP/GFR</td><td>پایین</td></tr><tr><td>FGF23</td><td>طبیعی</td></tr><tr><td>Creatinine</td><td>1.1 mg/dL</td></tr>
+      </tbody></table>
+      <p class="clinical-text">همچنین در آزمایش ادرار، پروتئینوری با غلبه پروتئین‌های با وزن مولکولی پایین گزارش شده است.</p>
+      <div class="question">محتمل‌ترین تشخیص و مکانیسم ایجاد هیپوفسفاتمی کدام است؟</div>
+      <div class="options">
+        <div class="option"><span class="option-letter">A</span><span><bdi dir="ltr">Tumor-induced osteomalacia</bdi>؛ افزایش FGF23 و مهار بازجذب فسفات</span></div>
+        <div class="option"><span class="option-letter">B</span><span>سندرم فانکونی اکتسابی؛ اختلال عملکرد توبول پروگزیمال و دفع هم‌زمان فسفات، گلوکز، اسیدهای آمینه و بیکربنات</span></div>
+        <div class="option"><span class="option-letter">C</span><span>هیپرپاراتیروئیدیسم اولیه؛ افزایش دفع کلیوی فسفات در اثر افزایش PTH</span></div>
+        <div class="option"><span class="option-letter">D</span><span>هیپوفسفاتمی ناشی از Redistribution؛ انتقال فسفات از فضای خارج سلولی به داخل سلول‌ها</span></div>
+      </div>
+      <div class="answer-toggle"><button class="btn primary toggle-answer" aria-expanded="false">نمایش پاسخ و توضیح <span>＋</span></button></div>
+      <section class="answer" aria-label="پاسخ سؤال سوم">
+        <div class="answer-head"><span>✓</span><span class="correct">پاسخ صحیح: گزینه B</span></div>
+        <div class="answer-content">
+          <p><strong>تشخیص: Acquired Fanconi syndrome ناشی از Tenofovir.</strong> فنوتیپ آزمایشگاهی نشان‌دهنده اختلال منتشر در بازجذب مواد در توبول پروگزیمال است.</p>
+          <ul>
+            <li>دفع فسفات: هیپوفسفاتمی و فسفاتوری.</li>
+            <li>دفع گلوکز با قند خون طبیعی: Euglycemic glycosuria.</li>
+            <li>دفع اسیدهای آمینه: Aminoaciduria.</li>
+            <li>دفع بیکربنات: اسیدوز توبولی کلیوی پروگزیمال (Type 2 RTA).</li>
+            <li>دفع اسیداوریک و پروتئین‌های با وزن مولکولی پایین: Hypouricemia و tubular proteinuria.</li>
+          </ul>
+          <div class="keypoint"><strong>نکته آزمونی:</strong> طبیعی بودن نسبی کراتینین، اختلال توبول پروگزیمال را رد نمی‌کند. ترکیب glycosuria با قند طبیعی، phosphaturia، aminoaciduria و bicarbonate wasting به‌شدت به نفع Fanconi syndrome است.</div>
+          <div class="caution"><strong>نکته مدیریتی:</strong> در صورت تأیید سمیت توبولی TDF، ضرورت ادامه دارو و امکان جایگزینی آن باید با پزشک مسئول درمان هپاتیت B بررسی شود. قطع خودسرانه داروی ضدویروسی در هپاتیت B مزمن ممکن است موجب flare یا عود هپاتیت شود.</div>
+        </div>
+        <div class="references"><strong>منابع منتخب</strong><ol>
+          <li>Chan L, et al. An overview of tenofovir and renal disease for the HIV-treating clinician. <i>HIV Med.</i> 2018. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6111387/" target="_blank" rel="noopener">متن کامل مقاله</a>.</li>
+          <li>Hall AM, et al. Tenofovir nephrotoxicity: 2011 update. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3119412/" target="_blank" rel="noopener">متن کامل مقاله</a>.</li>
+        </ol></div>
+      </section>
+    </div>
+  </article>
+
+  <article class="case" data-search="refeeding syndrome refeeding hypophosphatemia malnutrition enteral nutrition insulin thiamine phosphate potassium magnesium رفسیدینگ">
+    <div class="case-head">
+      <div class="case-top"><span class="case-number">CASE 04 · بیمار بدحال و تصمیم درمانی</span><span class="pill critical">سطح پیشرفته</span></div>
+      <h2>Refeeding syndrome و هیپوفسفاتمی شدید</h2>
+      <p class="case-subtitle">تمرکز: تشخیص شدت سندرم و تعدیل تغذیه همراه با اصلاح الکترولیت‌ها</p>
+    </div>
+    <div class="case-body">
+      <h3 class="section-title">شرح حال و یافته‌های بالینی</h3>
+      <p class="clinical-text">مرد ۶۲ ساله‌ای با سابقه سوءتغذیه شدید و کاهش وزن ۱۲٪ طی سه ماه اخیر، به علت اختلال بلع ناشی از تنگی مری بستری شده است. بیمار طی ۱۸ روز گذشته دریافت غذایی بسیار محدودی داشته است.</p>
+      <p class="clinical-text"><strong>در زمان بستری و پیش از شروع تغذیه:</strong></p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>مقدار</th></tr></thead><tbody><tr><td>Phosphate</td><td>2.6 mg/dL</td></tr><tr><td>Potassium</td><td>3.7 mEq/L</td></tr><tr><td>Magnesium</td><td>1.8 mg/dL</td></tr><tr><td>Creatinine</td><td>0.9 mg/dL</td></tr></tbody></table>
+      <p class="clinical-text">تغذیه انترال آغاز شده است؛ اما بیمار از روز اول تقریباً تمام کالری مورد نیاز روزانه را دریافت کرده است. ۷۲ ساعت بعد، دچار ضعف شدید عضلات، تنگی نفس و کاهش قدرت عضلات تنفسی می‌شود.</p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>مقدار</th></tr></thead><tbody><tr><td>Phosphate</td><td>0.6 mg/dL</td></tr><tr><td>Potassium</td><td>2.8 mEq/L</td></tr><tr><td>Magnesium</td><td>1.2 mg/dL</td></tr><tr><td>Calcium</td><td>8.5 mg/dL</td></tr><tr><td>Creatinine</td><td>0.9 mg/dL</td></tr><tr><td>Fractional excretion of phosphate</td><td>1.5%</td></tr></tbody></table>
+      <div class="question">مناسب‌ترین اقدام درمانی در این مرحله کدام است؟</div>
+      <div class="options">
+        <div class="option"><span class="option-letter">A</span><span>قطع کامل تغذیه انترال برای حداقل یک هفته و تجویز فسفات خوراکی</span></div>
+        <div class="option"><span class="option-letter">B</span><span>تجویز IV Phosphate به‌تنهایی و ادامه تغذیه با همان میزان کالری قبلی</span></div>
+        <div class="option"><span class="option-letter">C</span><span>تجویز IV Magnesium و Potassium و انتظار برای اصلاح خودبه‌خودی فسفات</span></div>
+        <div class="option"><span class="option-letter">D</span><span>جایگزینی فوری فسفات وریدی همراه با اصلاح پتاسیم و منیزیم، تجویز تیامین و کاهش حدود ۵۰٪ کالری دریافتی تا کنترل اختلالات الکترولیتی</span></div>
+      </div>
+      <div class="answer-toggle"><button class="btn primary toggle-answer" aria-expanded="false">نمایش پاسخ و توضیح <span>＋</span></button></div>
+      <section class="answer" aria-label="پاسخ سؤال چهارم">
+        <div class="answer-head"><span>✓</span><span class="correct">پاسخ صحیح: گزینه D</span></div>
+        <div class="answer-content">
+          <p><strong>تشخیص: Severe Refeeding Syndrome.</strong> افت شدید فسفات، پتاسیم و منیزیم طی پنج روز نخست بازگشت تغذیه، همراه با اختلال عملکرد تنفسی، با سندرم تغذیه مجدد شدید سازگار است.</p>
+          <p>طبق معیار اجماعی ASPEN، کاهش بیش از ۳۰٪ در هر یک از فسفر، پتاسیم یا منیزیم، یا بروز اختلال عملکرد ارگان در اثر این تغییرات، طی پنج روز از شروع یا افزایش دریافت کالری، در گروه شدید قرار می‌گیرد. در این کیس فسفات از ۲٫۶ به ۰٫۶ رسیده و افت آن بیش از ۷۵٪ است.</p>
+          <p><strong>مکانیسم:</strong> ورود مجدد کربوهیدرات موجب افزایش انسولین و انتقال فسفات، پتاسیم و منیزیم به داخل سلول می‌شود. کمبود فسفات داخل سلولی ATP را محدود می‌کند و ممکن است به ضعف دیافراگم، نارسایی تنفسی، اختلال عملکرد میوکارد، همولیز و رابدومیولیز منجر شود.</p>
+          <div class="keypoint"><strong>تفسیر FEPO₄:</strong> مقدار ۱٫۵٪ در زمینه هیپوفسفاتمی نشان می‌دهد کلیه به‌طور مناسب فسفات را حفظ می‌کند؛ این یافته با redistribution و کاهش دریافت/ذخایر بدن سازگارتر از دفع اولیه کلیوی است.</div>
+          <strong>اصول اقدام درمانی:</strong>
+          <ul>
+            <li><strong>فسفات وریدی:</strong> در هیپوفسفاتمی شدید و علامت‌دار، با توجه به عملکرد کلیه، کلسیم و پتاسیم؛ پایش دقیق به علت خطر هیپوکلسمی، هیپرفسفاتمی و رسوب کلسیم ـ فسفات ضروری است.</li>
+            <li><strong>پتاسیم و منیزیم:</strong> هم‌زمان و بر اساس شدت کمبود، مسیر مناسب و عملکرد کلیه جایگزین شوند.</li>
+            <li><strong>تیامین:</strong> در افراد در معرض خطر، ASPEN تجویز ۱۰۰ میلی‌گرم پیش از تغذیه یا دکستروز و ادامه روزانه برای ۵ تا ۷ روز یا بیشتر در موارد پرخطر را پیشنهاد می‌کند.</li>
+            <li><strong>کالری/دکستروز:</strong> در افت سریع یا دشواراصلاح الکترولیت‌ها، کالری یا گرم دکستروز حدود ۵۰٪ کاهش داده شود و سپس با توجه به وضعیت بالینی و آزمایش‌ها تدریجی افزایش یابد.</li>
+            <li><strong>پایش:</strong> فسفات، پتاسیم، منیزیم، کلسیم، قند، مایعات و وضعیت قلبی ـ تنفسی به‌صورت مکرر بررسی شوند.</li>
+          </ul>
+          <div class="caution"><strong>تعدیل مهم:</strong> قطع کامل تغذیه برای یک هفته، اقدام روتین و همگانی نیست. ASPEN کاهش کالری را در صورت افت شدید/سریع توصیه می‌کند؛ توقف موقت تغذیه ممکن است در شرایط بسیار شدید یا تهدیدکننده حیات و بر اساس قضاوت بالینی لازم شود.</div>
+        </div>
+        <div class="references"><strong>منابع منتخب</strong><ol>
+          <li>da Silva JSV, et al. ASPEN Consensus Recommendations for Refeeding Syndrome. <i>Nutr Clin Pract.</i> 2020;35(2):178–195. <a href="https://aspenjournals.onlinelibrary.wiley.com/doi/10.1002/ncp.10474" target="_blank" rel="noopener">مقاله و توصیه‌های اجماعی</a>.</li>
+        </ol></div>
+      </section>
+    </div>
+  </article>
+
+  <article class="case" data-search="respiratory alkalosis hyperventilation glycolysis intracellular shift hypophosphatemia ICU alkalosis آلکالوز تنفسی">
+    <div class="case-head">
+      <div class="case-top"><span class="case-number">CASE 05 · Redistribution در ICU</span><span class="pill advanced">سطح فوق‌تخصصی</span></div>
+      <h2>هیپوفسفاتمی ناشی از آلکالوز تنفسی</h2>
+      <p class="case-subtitle">تمرکز: افتراق انتقال داخل‌سلولی از دفع کلیوی فسفات</p>
+    </div>
+    <div class="case-body">
+      <h3 class="section-title">شرح حال و یافته‌های بالینی</h3>
+      <p class="clinical-text">مرد ۶۵ ساله‌ای به علت پنومونی شدید در ICU بستری و تحت تهویه مکانیکی است. پس از افزایش نامتناسب Minute ventilation تنظیمات ونتیلاتور، دچار آلکالوز تنفسی قابل‌توجه می‌شود.</p>
+      <p class="clinical-text"><strong>آزمایش‌های اولیه:</strong></p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>مقدار</th></tr></thead><tbody><tr><td>Phosphate</td><td>3.2 mg/dL</td></tr><tr><td>Potassium</td><td>4.1 mEq/L</td></tr><tr><td>Magnesium</td><td>1.9 mg/dL</td></tr><tr><td>Creatinine</td><td>0.9 mg/dL</td></tr></tbody></table>
+      <p class="clinical-text"><strong>۱۸ ساعت بعد:</strong></p>
+      <table class="lab-table"><thead><tr><th>آزمایش</th><th>مقدار</th></tr></thead><tbody><tr><td>Phosphate</td><td>0.8 mg/dL</td></tr><tr><td>Potassium</td><td>3.8 mEq/L</td></tr><tr><td>Magnesium</td><td>1.8 mg/dL</td></tr><tr><td>Creatinine</td><td>0.9 mg/dL</td></tr><tr><td>pH</td><td>7.61</td></tr><tr><td>PaCO₂</td><td>19 mmHg</td></tr><tr><td>HCO₃⁻</td><td>20 mEq/L</td></tr></tbody></table>
+      <p class="clinical-text">بررسی هم‌زمان خون و ادرار، پیش از تجویز فسفات، نشان می‌دهد <bdi dir="ltr">Fractional excretion of phosphate = 1.2%</bdi> و شواهدی از دفع نامتناسب کلیوی فسفات وجود ندارد. بیمار پیش از این اتفاق تغذیه کافی داشته و اخیراً انسولین دریافت نکرده است.</p>
+      <div class="question">کدام مکانیسم، افت سریع فسفات سرم را بهتر توضیح می‌دهد؟</div>
+      <div class="options">
+        <div class="option"><span class="option-letter">A</span><span>افزایش فعالیت PTH و مهار ناقل‌های سدیم ـ فسفات در توبول پروگزیمال</span></div>
+        <div class="option"><span class="option-letter">B</span><span>افزایش pH داخل سلولی و تحریک گلیکولیز، منجر به افزایش مصرف و به‌دام‌افتادن فسفات در ترکیبات فسفریله داخل سلول</span></div>
+        <div class="option"><span class="option-letter">C</span><span>افزایش FGF23 و کاهش بازجذب فسفات در توبول پروگزیمال</span></div>
+        <div class="option"><span class="option-letter">D</span><span>کاهش جذب روده‌ای فسفات به دنبال افزایش pH خون و ایجاد تعادل منفی فسفات</span></div>
+      </div>
+      <div class="answer-toggle"><button class="btn primary toggle-answer" aria-expanded="false">نمایش پاسخ و توضیح <span>＋</span></button></div>
+      <section class="answer" aria-label="پاسخ سؤال پنجم">
+        <div class="answer-head"><span>✓</span><span class="correct">پاسخ صحیح: گزینه B</span></div>
+        <div class="answer-content">
+          <p><strong>مکانیسم: Intracellular redistribution ناشی از آلکالوز تنفسی.</strong></p>
+          <ol>
+            <li>افزایش pH داخل سلولی، آنزیم phosphofructokinase را فعال می‌کند.</li>
+            <li>سرعت گلیکولیز افزایش می‌یابد و فسفات معدنی برای تشکیل واسطه‌های فسفریله مصرف و درون سلول محبوس می‌شود.</li>
+            <li>در نتیجه، فسفات سرم می‌تواند طی چند ساعت به‌سرعت کاهش یابد، بدون آن‌که دفع کلیوی عامل اصلی باشد.</li>
+          </ol>
+          <div class="keypoint"><strong>نکته تفسیری:</strong> FEPO₄ برابر ۱٫۲٪ در حضور هیپوفسفاتمی نشان‌دهنده حفظ مناسب فسفات توسط کلیه است و از مکانیسم redistribution حمایت می‌کند. در این بیمار، تنظیم مجدد تهویه و اصلاح علت hyperventilation بخش مهمی از درمان علت‌محور است.</div>
+          <p>در هیپوفسفاتمی شدید یا علامت‌دار، نیاز به جایگزینی فسفات بر اساس شدت، علائم، عملکرد کلیه و وضعیت کلسیم و پتاسیم ارزیابی می‌شود. صرف نسبت دادن افت فسفات به آلکالوز نباید موجب نادیده گرفتن کمبود ذخایر قبلی یا علل هم‌زمان شود.</p>
+        </div>
+        <div class="references"><strong>منابع منتخب</strong><ol>
+          <li>Geerse DA, et al. Treatment of hypophosphatemia in the intensive care unit: a review. <i>Crit Care.</i> 2010;14:R147. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2945130/" target="_blank" rel="noopener">متن کامل مقاله</a>.</li>
+          <li>Fluid and Electrolyte Disturbances in Critically Ill Patients. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3043756/" target="_blank" rel="noopener">متن کامل مرور علمی</a>.</li>
+        </ol></div>
+      </section>
+    </div>
+  </article>
+
+  <div class="empty" id="emptyState">موردی با این عبارت پیدا نشد.</div>
+  <div class="footer">مجموعه آموزشی هیپوفسفاتمی · مناسب مرور و بحث علمی در طب داخلی · منابع درون هر کیس لینک شده‌اند.</div>
+</main>
+<script>
+(() => {
+  const cards = [...document.querySelectorAll('.case')];
+  const search = document.getElementById('searchInput');
+  const empty = document.getElementById('emptyState');
+
+  function setAnswer(card, open) {
+    const answer = card.querySelector('.answer');
+    const button = card.querySelector('.toggle-answer');
+    answer.classList.toggle('show', open);
+    button.setAttribute('aria-expanded', String(open));
+    button.innerHTML = open ? 'بستن پاسخ <span>−</span>' : 'نمایش پاسخ و توضیح <span>＋</span>';
+  }
+
+  cards.forEach(card => {
+    card.querySelector('.toggle-answer').addEventListener('click', () => {
+      setAnswer(card, !card.querySelector('.answer').classList.contains('show'));
+    });
+  });
+
+  document.getElementById('expandAll').addEventListener('click', () => cards.forEach(card => setAnswer(card, true)));
+  document.getElementById('collapseAll').addEventListener('click', () => cards.forEach(card => setAnswer(card, false)));
+
+  search.addEventListener('input', () => {
+    const term = search.value.trim().toLocaleLowerCase('fa');
+    let visible = 0;
+    cards.forEach(card => {
+      const content = (card.innerText + ' ' + (card.dataset.search || '')).toLocaleLowerCase('fa');
+      const match = !term || content.includes(term);
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    empty.style.display = visible ? 'none' : 'block';
+  });
+})();
+</script>
+</body>
+</html>
